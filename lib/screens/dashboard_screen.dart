@@ -91,7 +91,7 @@ class DashboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF6C63FF).withOpacity(0.25),
+                      color: const Color(0xFF6C63FF).withValues(alpha: 0.25),
                       blurRadius: 24,
                       offset: const Offset(0, 12),
                     ),
@@ -324,7 +324,7 @@ class _ActionButton extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6C63FF).withOpacity(0.1),
+                  color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
