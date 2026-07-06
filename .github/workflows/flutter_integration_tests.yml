@@ -52,8 +52,7 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics
           script: |
             flutter devices
-            flutter test integration_test/task_test.dart -d emulator-5554 --machine > test_results.json
-
+            timeout 15m flutter test integration_test/task_test.dart -d emulator-5554 --machine | tee test_results.json
       - name: Generate HTML report
         if: always()
         run: |
