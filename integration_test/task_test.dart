@@ -297,6 +297,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Task to delete'), findsNothing);
-    expect(find.byKey(const Key('empty_task_list_text1')), findsOneWidget);
+    expect(find.byKey(const Key('empty_task_list_text')), findsOneWidget);
   });
 }
