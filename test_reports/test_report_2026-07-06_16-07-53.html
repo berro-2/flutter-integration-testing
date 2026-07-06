@@ -1,0 +1,721 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Flutter Integration Test Report</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .date {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #f8f9fb;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .card p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+
+        .passed {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .failed {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background-color: #f0f2f5;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+        }
+
+        .tab-button.active {
+            background-color: #222;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #222;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .passed-row {
+            background-color: #eaf7ee;
+        }
+
+        .failed-row {
+            background-color: #fdeaea;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge.passed {
+            background-color: #198754;
+        }
+
+        .badge.failed {
+            background-color: #dc3545;
+        }
+
+        pre {
+            background-color: #111;
+            color: #eee;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 13px;
+        }
+
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .empty-table {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .status-box {
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: #f8f9fb;
+            border: 1px solid #ddd;
+        }
+    </style>
+
+    <script>
+        function openTab(tabId, buttonElement) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            buttonElement.classList.add('active');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Flutter Integration Test Report</h1>
+        <div class="date">Generated on 2026-07-06 16:07:53</div>
+
+        <div class="status-box">
+            <h2 class="failed">Overall Result: FAILED</h2>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('summaryTab', this)">Summary</button>
+            <button class="tab-button" onclick="openTab('allTestsTab', this)">All Tests</button>
+            <button class="tab-button" onclick="openTab('passedTab', this)">Passed</button>
+            <button class="tab-button" onclick="openTab('failedTab', this)">Failed</button>
+            <button class="tab-button" onclick="openTab('logsTab', this)">Logs</button>
+        </div>
+
+        <div id="summaryTab" class="tab-content active">
+            <div class="summary">
+                <div class="card">
+                    <h2>12</h2>
+                    <p>Total Tests</p>
+                </div>
+
+                <div class="card">
+                    <h2>11</h2>
+                    <p>Passed</p>
+                </div>
+
+                <div class="card">
+                    <h2>1</h2>
+                    <p>Failed</p>
+                </div>
+
+                <div class="card">
+                    <h2>41.3s</h2>
+                    <p>Total Time</p>
+                </div>
+            </div>
+
+        
+        </div>
+
+        <div id="allTestsTab" class="tab-content">
+            <h2>All Test Cases</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test Case</th>
+                        <th>Result</th>
+                        <th>Duration</th>
+                        <th>Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr class="passed-row">
+            <td>1</td>
+            <td>Dashboard screen loads successfully</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>1.47s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>2</td>
+            <td>User can navigate from Dashboard to Task List</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>0.94s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>3</td>
+            <td>User can navigate from Dashboard to Add Task screen</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>0.84s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>4</td>
+            <td>Empty task title shows validation message</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>1.63s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>5</td>
+            <td>User can add a new task and see it on Dashboard</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>1.67s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>6</td>
+            <td>User can add a task and see it in Task List</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>2.4s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>7</td>
+            <td>User can open Task Details screen</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>2.92s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>8</td>
+            <td>User can mark task as completed from Task List</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>2.71s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>9</td>
+            <td>User can mark task as completed from Task Details</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>3.61s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>10</td>
+            <td>Statistics screen shows zero counts when no tasks exist</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>0.79s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>11</td>
+            <td>Statistics screen shows correct counts after completing a task</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>3.96s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="failed-row">
+            <td>12</td>
+            <td>User can delete a task from Task List</td>
+            <td><span class="badge failed">FAILED</span></td>
+            <td>2.88s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _KeyWidgetFinder:&lt;Found 0 widgets with key [&lt;&#x27;empty_task_list_text1&#x27;&gt;]: []&gt;
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.&lt;anonymous closure&gt; (file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart:300:5)
+&lt;asynchronous suspension&gt;
+#5      testWidgets.&lt;anonymous closure&gt;.&lt;anonymous closure&gt; (package:flutter_test/src/widget_tester.dart:192:15)
+&lt;asynchronous suspension&gt;
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+&lt;asynchronous suspension&gt;
+&lt;asynchronous suspension&gt;
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart line 300
+The test description was:
+  User can delete a task from Task List
+════════════════════════════════════════════════════════════════════════════════════════════════════</pre>
+                </details>
+            </td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+
+        <div id="passedTab" class="tab-content">
+            <h2>Passed Test Cases</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test Case</th>
+                        <th>Result</th>
+                        <th>Duration</th>
+                        <th>Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr class="passed-row">
+            <td>1</td>
+            <td>Dashboard screen loads successfully</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>1.47s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>2</td>
+            <td>User can navigate from Dashboard to Task List</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>0.94s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>3</td>
+            <td>User can navigate from Dashboard to Add Task screen</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>0.84s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>4</td>
+            <td>Empty task title shows validation message</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>1.63s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>5</td>
+            <td>User can add a new task and see it on Dashboard</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>1.67s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>6</td>
+            <td>User can add a task and see it in Task List</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>2.4s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>7</td>
+            <td>User can open Task Details screen</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>2.92s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>8</td>
+            <td>User can mark task as completed from Task List</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>2.71s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>9</td>
+            <td>User can mark task as completed from Task Details</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>3.61s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>10</td>
+            <td>Statistics screen shows zero counts when no tasks exist</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>0.79s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+        <tr class="passed-row">
+            <td>11</td>
+            <td>Statistics screen shows correct counts after completing a task</td>
+            <td><span class="badge passed">PASSED</span></td>
+            <td>3.96s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>No logs for this test.</pre>
+                </details>
+            </td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+
+        <div id="failedTab" class="tab-content">
+            <h2>Failed Test Cases</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test Case</th>
+                        <th>Result</th>
+                        <th>Duration</th>
+                        <th>Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr class="failed-row">
+            <td>1</td>
+            <td>User can delete a task from Task List</td>
+            <td><span class="badge failed">FAILED</span></td>
+            <td>2.88s</td>
+            <td>
+                <details>
+                    <summary>View logs</summary>
+                    <pre>══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _KeyWidgetFinder:&lt;Found 0 widgets with key [&lt;&#x27;empty_task_list_text1&#x27;&gt;]: []&gt;
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.&lt;anonymous closure&gt; (file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart:300:5)
+&lt;asynchronous suspension&gt;
+#5      testWidgets.&lt;anonymous closure&gt;.&lt;anonymous closure&gt; (package:flutter_test/src/widget_tester.dart:192:15)
+&lt;asynchronous suspension&gt;
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)
+&lt;asynchronous suspension&gt;
+&lt;asynchronous suspension&gt;
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart line 300
+The test description was:
+  User can delete a task from Task List
+════════════════════════════════════════════════════════════════════════════════════════════════════</pre>
+                </details>
+            </td>
+        </tr>
+        
+                </tbody>
+            </table>
+
+            <h2>Crash / Error Logs</h2>
+            <pre>══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+
+The following TestFailure was thrown running a test:
+
+When the exception was thrown, this was the stack:
+
+Test failed. See exception logs above.
+The test description was: User can delete a task from Task List
+</pre>
+        </div>
+
+        <div id="logsTab" class="tab-content">
+            <h2>Full Raw Logs</h2>
+            <pre>{&quot;protocolVersion&quot;:&quot;0.1.1&quot;,&quot;runnerVersion&quot;:null,&quot;pid&quot;:26644,&quot;type&quot;:&quot;start&quot;,&quot;time&quot;:0}
+{&quot;suite&quot;:{&quot;id&quot;:0,&quot;platform&quot;:&quot;vm&quot;,&quot;path&quot;:&quot;C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart&quot;},&quot;type&quot;:&quot;suite&quot;,&quot;time&quot;:0}
+{&quot;test&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;loading C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:null,&quot;column&quot;:null,&quot;url&quot;:null},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:0}
+{&quot;count&quot;:1,&quot;time&quot;:3,&quot;type&quot;:&quot;allSuites&quot;}
+✓ Built build\app\outputs\flutter-apk\app-debug.apk
+
+[{&quot;event&quot;:&quot;test.startedProcess&quot;,&quot;params&quot;:{&quot;vmServiceUri&quot;:&quot;http://127.0.0.1:53170/wxcp0GVDROk=/&quot;}}]
+{&quot;testID&quot;:1,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:true,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:14996}
+{&quot;group&quot;:{&quot;id&quot;:2,&quot;suiteID&quot;:0,&quot;parentID&quot;:null,&quot;name&quot;:&quot;&quot;,&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;testCount&quot;:12,&quot;line&quot;:null,&quot;column&quot;:null,&quot;url&quot;:null},&quot;type&quot;:&quot;group&quot;,&quot;time&quot;:15000}
+{&quot;test&quot;:{&quot;id&quot;:3,&quot;name&quot;:&quot;Dashboard screen loads successfully&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:15000}
+{&quot;testID&quot;:3,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:16466}
+{&quot;test&quot;:{&quot;id&quot;:4,&quot;name&quot;:&quot;User can navigate from Dashboard to Task List&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:16466}
+{&quot;testID&quot;:4,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:17411}
+{&quot;test&quot;:{&quot;id&quot;:5,&quot;name&quot;:&quot;User can navigate from Dashboard to Add Task screen&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:17411}
+{&quot;testID&quot;:5,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:18256}
+{&quot;test&quot;:{&quot;id&quot;:6,&quot;name&quot;:&quot;Empty task title shows validation message&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:18256}
+{&quot;testID&quot;:6,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:19885}
+{&quot;test&quot;:{&quot;id&quot;:7,&quot;name&quot;:&quot;User can add a new task and see it on Dashboard&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:19886}
+{&quot;testID&quot;:7,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:21554}
+{&quot;test&quot;:{&quot;id&quot;:8,&quot;name&quot;:&quot;User can add a task and see it in Task List&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:21554}
+{&quot;testID&quot;:8,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:23956}
+{&quot;test&quot;:{&quot;id&quot;:9,&quot;name&quot;:&quot;User can open Task Details screen&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:23956}
+{&quot;testID&quot;:9,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:26879}
+{&quot;test&quot;:{&quot;id&quot;:10,&quot;name&quot;:&quot;User can mark task as completed from Task List&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:26879}
+{&quot;testID&quot;:10,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:29587}
+{&quot;test&quot;:{&quot;id&quot;:11,&quot;name&quot;:&quot;User can mark task as completed from Task Details&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:29587}
+{&quot;testID&quot;:11,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:33198}
+{&quot;test&quot;:{&quot;id&quot;:12,&quot;name&quot;:&quot;Statistics screen shows zero counts when no tasks exist&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:33199}
+{&quot;testID&quot;:12,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:33989}
+{&quot;test&quot;:{&quot;id&quot;:13,&quot;name&quot;:&quot;Statistics screen shows correct counts after completing a task&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:33990}
+{&quot;testID&quot;:13,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:37955}
+{&quot;test&quot;:{&quot;id&quot;:14,&quot;name&quot;:&quot;User can delete a task from Task List&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:174,&quot;column&quot;:5,&quot;url&quot;:&quot;package:flutter_test/src/widget_tester.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:37956}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40818}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;The following TestFailure was thrown running a test:&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40819}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;Expected: exactly one matching candidate&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40819}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;  Actual: _KeyWidgetFinder:&lt;Found 0 widgets with key [&lt;&#x27;empty_task_list_text1&#x27;&gt;]: []&gt;&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40819}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;   Which: means none were found but one was expected&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40819}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40819}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;When the exception was thrown, this was the stack:&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40819}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;#4      main.&lt;anonymous closure&gt; (file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart:300:5)&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40820}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;&lt;asynchronous suspension&gt;&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40821}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;#5      testWidgets.&lt;anonymous closure&gt;.&lt;anonymous closure&gt; (package:flutter_test/src/widget_tester.dart:192:15)&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40821}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;&lt;asynchronous suspension&gt;&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40822}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40823}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;&lt;asynchronous suspension&gt;&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40825}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;&lt;asynchronous suspension&gt;&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40825}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;(elided one frame from package:stack_trace)&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40827}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40827}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;This was caught by the test expectation on the following line:&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40827}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;  file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart line 300&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40827}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;The test description was:&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40829}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;  User can delete a task from Task List&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40829}
+{&quot;testID&quot;:14,&quot;messageType&quot;:&quot;print&quot;,&quot;message&quot;:&quot;════════════════════════════════════════════════════════════════════════════════════════════════════&quot;,&quot;type&quot;:&quot;print&quot;,&quot;time&quot;:40829}
+{&quot;testID&quot;:14,&quot;error&quot;:&quot;Test failed. See exception logs above.\nThe test description was: User can delete a task from Task List&quot;,&quot;stackTrace&quot;:&quot;&quot;,&quot;isFailure&quot;:false,&quot;type&quot;:&quot;error&quot;,&quot;time&quot;:40834}
+{&quot;testID&quot;:14,&quot;result&quot;:&quot;error&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:false,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:40835}
+{&quot;test&quot;:{&quot;id&quot;:15,&quot;name&quot;:&quot;(tearDownAll)&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[2],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:50,&quot;column&quot;:5,&quot;url&quot;:&quot;package:integration_test/integration_test.dart&quot;},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:40835}
+{&quot;testID&quot;:15,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:true,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:40852}
+{&quot;success&quot;:false,&quot;type&quot;:&quot;done&quot;,&quot;time&quot;:41300}</pre>
+        </div>
+
+        <div class="footer">
+            Generated from Flutter machine test output: test_results.json
+        </div>
+    </div>
+</body>
+</html>

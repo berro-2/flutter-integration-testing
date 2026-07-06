@@ -1,0 +1,58 @@
+{"protocolVersion":"0.1.1","runnerVersion":null,"pid":26644,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":0}
+{"count":1,"time":3,"type":"allSuites"}
+✓ Built build\app\outputs\flutter-apk\app-debug.apk
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":"http://127.0.0.1:53170/wxcp0GVDROk=/"}}]
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":14996}
+{"group":{"id":2,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":12,"line":null,"column":null,"url":null},"type":"group","time":15000}
+{"test":{"id":3,"name":"Dashboard screen loads successfully","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":15000}
+{"testID":3,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":16466}
+{"test":{"id":4,"name":"User can navigate from Dashboard to Task List","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":16466}
+{"testID":4,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":17411}
+{"test":{"id":5,"name":"User can navigate from Dashboard to Add Task screen","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":17411}
+{"testID":5,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":18256}
+{"test":{"id":6,"name":"Empty task title shows validation message","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":18256}
+{"testID":6,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":19885}
+{"test":{"id":7,"name":"User can add a new task and see it on Dashboard","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":19886}
+{"testID":7,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":21554}
+{"test":{"id":8,"name":"User can add a task and see it in Task List","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":21554}
+{"testID":8,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":23956}
+{"test":{"id":9,"name":"User can open Task Details screen","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":23956}
+{"testID":9,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":26879}
+{"test":{"id":10,"name":"User can mark task as completed from Task List","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":26879}
+{"testID":10,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":29587}
+{"test":{"id":11,"name":"User can mark task as completed from Task Details","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":29587}
+{"testID":11,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":33198}
+{"test":{"id":12,"name":"Statistics screen shows zero counts when no tasks exist","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":33199}
+{"testID":12,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":33989}
+{"test":{"id":13,"name":"Statistics screen shows correct counts after completing a task","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":33990}
+{"testID":13,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":37955}
+{"test":{"id":14,"name":"User can delete a task from Task List","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart"},"type":"testStart","time":37956}
+{"testID":14,"messageType":"print","message":"══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════","type":"print","time":40818}
+{"testID":14,"messageType":"print","message":"The following TestFailure was thrown running a test:","type":"print","time":40819}
+{"testID":14,"messageType":"print","message":"Expected: exactly one matching candidate","type":"print","time":40819}
+{"testID":14,"messageType":"print","message":"  Actual: _KeyWidgetFinder:<Found 0 widgets with key [<'empty_task_list_text1'>]: []>","type":"print","time":40819}
+{"testID":14,"messageType":"print","message":"   Which: means none were found but one was expected","type":"print","time":40819}
+{"testID":14,"messageType":"print","message":"","type":"print","time":40819}
+{"testID":14,"messageType":"print","message":"When the exception was thrown, this was the stack:","type":"print","time":40819}
+{"testID":14,"messageType":"print","message":"#4      main.<anonymous closure> (file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart:300:5)","type":"print","time":40820}
+{"testID":14,"messageType":"print","message":"<asynchronous suspension>","type":"print","time":40821}
+{"testID":14,"messageType":"print","message":"#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)","type":"print","time":40821}
+{"testID":14,"messageType":"print","message":"<asynchronous suspension>","type":"print","time":40822}
+{"testID":14,"messageType":"print","message":"#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1682:5)","type":"print","time":40823}
+{"testID":14,"messageType":"print","message":"<asynchronous suspension>","type":"print","time":40825}
+{"testID":14,"messageType":"print","message":"<asynchronous suspension>","type":"print","time":40825}
+{"testID":14,"messageType":"print","message":"(elided one frame from package:stack_trace)","type":"print","time":40827}
+{"testID":14,"messageType":"print","message":"","type":"print","time":40827}
+{"testID":14,"messageType":"print","message":"This was caught by the test expectation on the following line:","type":"print","time":40827}
+{"testID":14,"messageType":"print","message":"  file:///C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart line 300","type":"print","time":40827}
+{"testID":14,"messageType":"print","message":"The test description was:","type":"print","time":40829}
+{"testID":14,"messageType":"print","message":"  User can delete a task from Task List","type":"print","time":40829}
+{"testID":14,"messageType":"print","message":"════════════════════════════════════════════════════════════════════════════════════════════════════","type":"print","time":40829}
+{"testID":14,"error":"Test failed. See exception logs above.\nThe test description was: User can delete a task from Task List","stackTrace":"","isFailure":false,"type":"error","time":40834}
+{"testID":14,"result":"error","skipped":false,"hidden":false,"type":"testDone","time":40835}
+{"test":{"id":15,"name":"(tearDownAll)","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":50,"column":5,"url":"package:integration_test/integration_test.dart"},"type":"testStart","time":40835}
+{"testID":15,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":40852}
+{"success":false,"type":"done","time":41300}

@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Flutter Integration Test Report</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .date {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #f8f9fb;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .card p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+
+        .passed {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .failed {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background-color: #f0f2f5;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+        }
+
+        .tab-button.active {
+            background-color: #222;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #222;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .passed-row {
+            background-color: #eaf7ee;
+        }
+
+        .failed-row {
+            background-color: #fdeaea;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge.passed {
+            background-color: #198754;
+        }
+
+        .badge.failed {
+            background-color: #dc3545;
+        }
+
+        pre {
+            background-color: #111;
+            color: #eee;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 13px;
+        }
+
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .empty-table {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .status-box {
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: #f8f9fb;
+            border: 1px solid #ddd;
+        }
+    </style>
+
+    <script>
+        function openTab(tabId, buttonElement) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            buttonElement.classList.add('active');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Flutter Integration Test Report</h1>
+        <div class="date">Generated on 2026-07-06 16:02:52</div>
+
+        <div class="status-box">
+            <h2 class="passed">Overall Result: PASSED</h2>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('summaryTab', this)">Summary</button>
+            <button class="tab-button" onclick="openTab('allTestsTab', this)">All Tests</button>
+            <button class="tab-button" onclick="openTab('passedTab', this)">Passed</button>
+            <button class="tab-button" onclick="openTab('failedTab', this)">Failed</button>
+            <button class="tab-button" onclick="openTab('logsTab', this)">Logs</button>
+        </div>
+
+        <div id="summaryTab" class="tab-content active">
+            <div class="summary">
+                <div class="card">
+                    <h2>0</h2>
+                    <p>Total Tests</p>
+                </div>
+
+                <div class="card">
+                    <h2>0</h2>
+                    <p>Passed</p>
+                </div>
+
+                <div class="card">
+                    <h2>0</h2>
+                    <p>Failed</p>
+                </div>
+
+                <div class="card">
+                    <h2>3.72s</h2>
+                    <p>Total Time</p>
+                </div>
+            </div>
+
+        
+        </div>
+
+        <div id="allTestsTab" class="tab-content">
+            <h2>All Test Cases</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test Case</th>
+                        <th>Result</th>
+                        <th>Duration</th>
+                        <th>Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td colspan="5" class="empty-table">No test cases in this group.</td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+
+        <div id="passedTab" class="tab-content">
+            <h2>Passed Test Cases</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test Case</th>
+                        <th>Result</th>
+                        <th>Duration</th>
+                        <th>Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td colspan="5" class="empty-table">No test cases in this group.</td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+
+        <div id="failedTab" class="tab-content">
+            <h2>Failed Test Cases</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test Case</th>
+                        <th>Result</th>
+                        <th>Duration</th>
+                        <th>Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td colspan="5" class="empty-table">No test cases in this group.</td>
+        </tr>
+        
+                </tbody>
+            </table>
+
+            <h2>Crash / Error Logs</h2>
+            <pre>No crash or error logs detected.</pre>
+        </div>
+
+        <div id="logsTab" class="tab-content">
+            <h2>Full Raw Logs</h2>
+            <pre>{&quot;protocolVersion&quot;:&quot;0.1.1&quot;,&quot;runnerVersion&quot;:null,&quot;pid&quot;:4932,&quot;type&quot;:&quot;start&quot;,&quot;time&quot;:0}
+{&quot;suite&quot;:{&quot;id&quot;:0,&quot;platform&quot;:&quot;vm&quot;,&quot;path&quot;:&quot;C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart&quot;},&quot;type&quot;:&quot;suite&quot;,&quot;time&quot;:0}
+{&quot;test&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;loading C:/Users/96171/Desktop/flutter/integration_demo_app/integration_test/task_test.dart&quot;,&quot;suiteID&quot;:0,&quot;groupIDs&quot;:[],&quot;metadata&quot;:{&quot;skip&quot;:false,&quot;skipReason&quot;:null},&quot;line&quot;:null,&quot;column&quot;:null,&quot;url&quot;:null},&quot;type&quot;:&quot;testStart&quot;,&quot;time&quot;:0}
+{&quot;count&quot;:1,&quot;time&quot;:3,&quot;type&quot;:&quot;allSuites&quot;}
+{&quot;testID&quot;:1,&quot;result&quot;:&quot;success&quot;,&quot;skipped&quot;:false,&quot;hidden&quot;:true,&quot;type&quot;:&quot;testDone&quot;,&quot;time&quot;:3717}
+{&quot;success&quot;:true,&quot;type&quot;:&quot;done&quot;,&quot;time&quot;:3719}
+Terminate batch job (Y/N)? 
+^C</pre>
+        </div>
+
+        <div class="footer">
+            Generated from Flutter machine test output: test_results.json
+        </div>
+    </div>
+</body>
+</html>
