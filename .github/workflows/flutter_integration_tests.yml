@@ -9,10 +9,17 @@ on:
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -34,30 +41,40 @@ jobs:
       - name: Run integration tests on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
-          target: default
+          api-level: 30
+          target: google_apis
           arch: x86_64
-          profile: Nexus 6
-          cores: 4
-          ram-size: 4096M
+          profile: pixel_2
+          cores: 2
+          ram-size: 2048M
           heap-size: 512M
-          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics
           disable-animations: true
-          script: flutter test integration_test/task_test.dart --machine > test_results.json
-      
+          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics
+          script: |
+            flutter devices
+            flutter test integration_test/task_test.dart -d emulator-5554 --machine > test_results.json
+
       - name: Generate HTML report
-        run: python generate_report.py
+        if: always()
+        run: |
+          if [ -f test_results.json ]; then
+            python generate_report.py
+          else
+            echo "test_results.json was not created because the emulator or tests failed before Flutter generated results."
+          fi
 
       - name: Upload HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: flutter-html-report
           path: test_reports/
-      
+          if-no-files-found: ignore
+
       - name: Upload test result JSON
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: flutter-test-results
           path: test_results.json
-
-      
+          if-no-files-found: ignore
