@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-
 import 'package:integration_demo_app/main.dart' as app;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   Future<void> startApp(WidgetTester tester) async {
-    await tester.pumpWidget(
-      const app.MyApp()
-    );
+    await tester.pumpWidget(const app.MyApp());
+    await tester.pumpAndSettle();
+  }
 
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    expect(finder, findsOneWidget);
+    await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
+    await tester.tap(finder);
     await tester.pumpAndSettle();
   }
 
@@ -32,8 +36,7 @@ void main() {
   testWidgets('User can navigate from Dashboard to Task List', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_task_list_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_task_list_button')));
 
     expect(find.byKey(const Key('task_list_screen')), findsOneWidget);
     expect(find.text('Tasks'), findsOneWidget);
@@ -44,8 +47,7 @@ void main() {
   testWidgets('User can navigate from Dashboard to Add Task screen', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     expect(find.byKey(const Key('add_task_screen')), findsOneWidget);
     expect(find.text('Add Task'), findsOneWidget);
@@ -57,11 +59,8 @@ void main() {
   testWidgets('Empty task title shows validation message', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
 
     expect(find.byKey(const Key('error_message')), findsOneWidget);
     expect(find.text('Task title is required'), findsOneWidget);
@@ -70,8 +69,7 @@ void main() {
   testWidgets('User can add a new task and see it on Dashboard', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     await tester.enterText(
       find.byKey(const Key('task_title_input')),
@@ -83,20 +81,18 @@ void main() {
       'Create integration test demo with multiple screens',
     );
 
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
 
     expect(find.byKey(const Key('dashboard_screen')), findsOneWidget);
     expect(find.text('Total Tasks: 1'), findsOneWidget);
     expect(find.text('Completed: 0'), findsOneWidget);
     expect(find.text('Pending: 1'), findsOneWidget);
-  }); 
+  });
 
   testWidgets('User can add a task and see it in Task List', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     await tester.enterText(
       find.byKey(const Key('task_title_input')),
@@ -108,11 +104,8 @@ void main() {
       'This task should appear in the list screen',
     );
 
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('open_task_list_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
+    await tapVisible(tester, find.byKey(const Key('open_task_list_button')));
 
     expect(find.byKey(const Key('task_list_screen')), findsOneWidget);
     expect(find.text('Task visible in list'), findsOneWidget);
@@ -123,8 +116,7 @@ void main() {
   testWidgets('User can open Task Details screen', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     await tester.enterText(
       find.byKey(const Key('task_title_input')),
@@ -136,14 +128,9 @@ void main() {
       'This task is used to test the details screen',
     );
 
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('open_task_list_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('task_tile_0')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
+    await tapVisible(tester, find.byKey(const Key('open_task_list_button')));
+    await tapVisible(tester, find.byKey(const Key('task_tile_0')));
 
     expect(find.byKey(const Key('task_details_screen')), findsOneWidget);
     expect(find.text('Task Details'), findsOneWidget);
@@ -155,8 +142,7 @@ void main() {
   testWidgets('User can mark task as completed from Task List', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     await tester.enterText(
       find.byKey(const Key('task_title_input')),
@@ -168,14 +154,9 @@ void main() {
       'Testing checkbox completion',
     );
 
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('open_task_list_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('task_checkbox_0')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
+    await tapVisible(tester, find.byKey(const Key('open_task_list_button')));
+    await tapVisible(tester, find.byKey(const Key('task_checkbox_0')));
 
     expect(find.text('Completed'), findsOneWidget);
     expect(find.text('Pending'), findsNothing);
@@ -184,8 +165,7 @@ void main() {
   testWidgets('User can mark task as completed from Task Details', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     await tester.enterText(
       find.byKey(const Key('task_title_input')),
@@ -197,20 +177,14 @@ void main() {
       'Testing completion from details screen',
     );
 
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('open_task_list_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('task_tile_0')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
+    await tapVisible(tester, find.byKey(const Key('open_task_list_button')));
+    await tapVisible(tester, find.byKey(const Key('task_tile_0')));
 
     expect(find.byKey(const Key('task_details_screen')), findsOneWidget);
     expect(find.text('Status: Pending'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('details_toggle_complete_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('details_toggle_complete_button')));
 
     expect(find.byKey(const Key('task_list_screen')), findsOneWidget);
     expect(find.text('Completed'), findsOneWidget);
@@ -219,24 +193,20 @@ void main() {
   testWidgets('Statistics screen shows zero counts when no tasks exist', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_statistics_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_statistics_button')));
 
     expect(find.byKey(const Key('statistics_screen')), findsOneWidget);
     expect(find.text('Statistics'), findsOneWidget);
-
     expect(find.byKey(const Key('statistics_total_tasks')), findsOneWidget);
     expect(find.byKey(const Key('statistics_completed_tasks')), findsOneWidget);
     expect(find.byKey(const Key('statistics_pending_tasks')), findsOneWidget);
-
     expect(find.text('0'), findsNWidgets(3));
   });
 
   testWidgets('Statistics screen shows correct counts after completing a task', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     await tester.enterText(
       find.byKey(const Key('task_title_input')),
@@ -248,23 +218,16 @@ void main() {
       'Testing statistics screen',
     );
 
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('open_task_list_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('task_checkbox_0')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
+    await tapVisible(tester, find.byKey(const Key('open_task_list_button')));
+    await tapVisible(tester, find.byKey(const Key('task_checkbox_0')));
 
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('open_statistics_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_statistics_button')));
 
     expect(find.byKey(const Key('statistics_screen')), findsOneWidget);
-
     expect(find.text('1'), findsNWidgets(2)); // total = 1, completed = 1
     expect(find.text('0'), findsOneWidget); // pending = 0
   });
@@ -272,8 +235,7 @@ void main() {
   testWidgets('User can delete a task from Task List', (tester) async {
     await startApp(tester);
 
-    await tester.tap(find.byKey(const Key('open_add_task_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('open_add_task_button')));
 
     await tester.enterText(
       find.byKey(const Key('task_title_input')),
@@ -285,16 +247,12 @@ void main() {
       'This task will be deleted',
     );
 
-    await tester.tap(find.byKey(const Key('save_task_button')));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const Key('open_task_list_button')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('save_task_button')));
+    await tapVisible(tester, find.byKey(const Key('open_task_list_button')));
 
     expect(find.text('Task to delete'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('delete_task_button_0')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const Key('delete_task_button_0')));
 
     expect(find.text('Task to delete'), findsNothing);
     expect(find.byKey(const Key('empty_task_list_text')), findsOneWidget);
