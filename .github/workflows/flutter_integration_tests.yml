@@ -2,12 +2,18 @@ name: Flutter Integration Tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  android-integration-tests:
+  # =========================================================
+  # Android
+  # =========================================================
+  android-tests:
     name: Android Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -20,6 +26,7 @@ jobs:
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
             | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
@@ -47,11 +54,11 @@ jobs:
       - name: Run Flutter analyzer
         run: flutter analyze
 
-      - name: Clean previous Android reports
+      - name: Clean previous reports
         run: |
-          rm -rf test_reports_android
-          rm -f android_test_results.json
-          mkdir -p test_reports_android
+          rm -rf test_reports
+          rm -f test_results.json
+          mkdir -p test_reports
 
       - name: Run Android integration tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -71,20 +78,18 @@ jobs:
             -no-snapshot
             -gpu swiftshader_indirect
             -no-metrics
-          script: bash -lc 'set -o pipefail; flutter devices; timeout 20m flutter test integration_test/task_test.dart -d emulator-5554 --machine | tee android_test_results.json'
+          script: bash -lc 'set -o pipefail; flutter devices; timeout 20m flutter test integration_test/task_test.dart -d emulator-5554 --machine | tee test_results.json'
 
       - name: Generate Android HTML report
         if: always()
         run: |
-          if [ -s android_test_results.json ] && [ -f generate_report.py ]; then
-            cp android_test_results.json test_results.json
-            python3 generate_report.py
+          rm -rf test_reports
+          mkdir -p test_reports
 
-            if [ -d test_reports ]; then
-              cp -R test_reports/. test_reports_android/
-            fi
+          if [ -s test_results.json ] && [ -f generate_report.py ]; then
+            python3 generate_report.py
           else
-            echo "Android test results or report generator not found."
+            echo "The test result file or generate_report.py was not found."
           fi
 
       - name: Upload Android HTML report
@@ -92,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-html-report
-          path: test_reports_android/
+          path: test_reports/
           if-no-files-found: warn
           retention-days: 14
 
@@ -101,11 +106,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-test-results
-          path: android_test_results.json
+          path: test_results.json
           if-no-files-found: warn
           retention-days: 14
 
-  ios-integration-tests:
+  # =========================================================
+  # iOS
+  # =========================================================
+  ios-tests:
     name: iOS Integration Tests
     runs-on: macos-latest
     timeout-minutes: 45
@@ -128,34 +136,33 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Prepare iOS project
-        run: flutter build ios --simulator --config-only
-
       - name: Run Flutter analyzer
         run: flutter analyze
 
-      - name: Clean previous iOS reports
+      - name: Clean previous reports
         run: |
-          rm -rf test_reports_ios
-          rm -f ios_test_results.json
-          mkdir -p test_reports_ios
+          rm -rf test_reports
+          rm -f test_results.json
+          mkdir -p test_reports
 
-      - name: Start iPhone Simulator
+      - name: Find and start iPhone Simulator
         id: simulator
         shell: bash
         run: |
           set -euo pipefail
 
+          echo "Available simulators:"
+          xcrun simctl list devices available
+
           DEVICE_ID="$(
             xcrun simctl list devices available |
-            grep -E 'iPhone (16|15|14)' |
+            grep -E 'iPhone' |
             head -n 1 |
-            sed -E 's/.*\(([0-9A-F-]+)\).*/\1/'
+            sed -E 's/.*\(([0-9A-Fa-f-]{36})\).*/\1/'
           )"
 
           if [ -z "$DEVICE_ID" ]; then
             echo "No available iPhone Simulator was found."
-            xcrun simctl list devices available
             exit 1
           fi
 
@@ -166,7 +173,7 @@ jobs:
           open -a Simulator
           xcrun simctl bootstatus "$DEVICE_ID" -b
 
-      - name: Verify iOS device
+      - name: Verify iOS Simulator
         run: |
           flutter devices
           flutter devices --device-timeout 60
@@ -178,20 +185,19 @@ jobs:
 
           flutter test integration_test/task_test.dart \
             -d "${{ steps.simulator.outputs.device_id }}" \
-            --machine | tee ios_test_results.json
+            --machine |
+            tee test_results.json
 
       - name: Generate iOS HTML report
         if: always()
         run: |
-          if [ -s ios_test_results.json ] && [ -f generate_report.py ]; then
-            cp ios_test_results.json test_results.json
-            python3 generate_report.py
+          rm -rf test_reports
+          mkdir -p test_reports
 
-            if [ -d test_reports ]; then
-              cp -R test_reports/. test_reports_ios/
-            fi
+          if [ -s test_results.json ] && [ -f generate_report.py ]; then
+            python3 generate_report.py
           else
-            echo "iOS test results or report generator not found."
+            echo "The test result file or generate_report.py was not found."
           fi
 
       - name: Upload iOS HTML report
@@ -199,7 +205,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-html-report
-          path: test_reports_ios/
+          path: test_reports/
           if-no-files-found: warn
           retention-days: 14
 
@@ -208,6 +214,59 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-test-results
-          path: ios_test_results.json
+          path: test_results.json
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Collect iOS Simulator logs
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p simulator_logs
+
+          xcrun simctl spawn \
+            "${{ steps.simulator.outputs.device_id }}" \
+            log show \
+            --style compact \
+            --last 20m \
+            > simulator_logs/ios-simulator.log || true
+
+      - name: Upload iOS Simulator logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-logs
+          path: simulator_logs/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # =========================================================
+  # Final combined result
+  # =========================================================
+  all-tests-passed:
+    name: All Mobile Tests Passed
+    needs:
+      - android-tests
+      - ios-tests
+
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check Android and iOS results
+        shell: bash
+        run: |
+          echo "Android result: ${{ needs.android-tests.result }}"
+          echo "iOS result: ${{ needs.ios-tests.result }}"
+
+          if [ "${{ needs.android-tests.result }}" != "success" ]; then
+            echo "Android integration tests did not pass."
+            exit 1
+          fi
+
+          if [ "${{ needs.ios-tests.result }}" != "success" ]; then
+            echo "iOS integration tests did not pass."
+            exit 1
+          fi
+
+          echo "Android and iOS integration tests passed successfully."
