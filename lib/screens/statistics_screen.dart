@@ -14,14 +14,13 @@ class StatisticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completionRate =
-        totalTasks == 0 ? 0.0 : completedTasks / totalTasks.toDouble();
+    final completionRate = totalTasks == 0
+        ? 0.0
+        : completedTasks / totalTasks.toDouble();
 
     return Scaffold(
       key: const Key('statistics_screen'),
-      appBar: AppBar(
-        title: const Text('Statistics'),
-      ),
+      appBar: AppBar(title: const Text('Statistics')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -151,19 +150,13 @@ class _StatisticsTile extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
             ),
           ),
           Text(
             value,
             key: Key(keyValue),
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-            ),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
           ),
         ],
       ),

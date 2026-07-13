@@ -23,9 +23,7 @@ class TaskDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       key: const Key('task_details_screen'),
-      appBar: AppBar(
-        title: const Text('Task Details'),
-      ),
+      appBar: AppBar(title: const Text('Task Details')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),

@@ -40,11 +40,7 @@ class DashboardScreen extends StatelessWidget {
   void openAddTask(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => AddTaskScreen(
-          onAddTask: onAddTask,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => AddTaskScreen(onAddTask: onAddTask)),
     );
   }
 
@@ -63,14 +59,13 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completionRate =
-        tasks.isEmpty ? 0.0 : completedTasks / tasks.length.toDouble();
+    final completionRate = tasks.isEmpty
+        ? 0.0
+        : completedTasks / tasks.length.toDouble();
 
     return Scaffold(
       key: const Key('dashboard_screen'),
-      appBar: AppBar(
-        title: const Text('Task Manager Dashboard'),
-      ),
+      appBar: AppBar(title: const Text('Task Manager Dashboard')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -81,10 +76,7 @@ class DashboardScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF6C63FF),
-                      Color(0xFF8E86FF),
-                    ],
+                    colors: [Color(0xFF6C63FF), Color(0xFF8E86FF)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -253,10 +245,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 18,
-        horizontal: 12,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
@@ -277,10 +266,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0xFF6B7280),
-            ),
+            style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
           ),
         ],
       ),
@@ -327,10 +313,7 @@ class _ActionButton extends StatelessWidget {
                   color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
-                  icon,
-                  color: const Color(0xFF6C63FF),
-                ),
+                child: Icon(icon, color: const Color(0xFF6C63FF)),
               ),
               const SizedBox(width: 16),
               Expanded(

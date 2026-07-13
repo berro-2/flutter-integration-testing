@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class AddTaskScreen extends StatefulWidget {
   final void Function(String title, String description) onAddTask;
 
-  const AddTaskScreen({
-    super.key,
-    required this.onAddTask,
-  });
+  const AddTaskScreen({super.key, required this.onAddTask});
 
   @override
   State<AddTaskScreen> createState() => _AddTaskScreenState();
@@ -46,9 +43,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: const Key('add_task_screen'),
-      appBar: AppBar(
-        title: const Text('Add Task'),
-      ),
+      appBar: AppBar(title: const Text('Add Task')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -64,11 +59,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
                 child: const Column(
                   children: [
-                    Icon(
-                      Icons.add_task,
-                      size: 62,
-                      color: Color(0xFF6C63FF),
-                    ),
+                    Icon(Icons.add_task, size: 62, color: Color(0xFF6C63FF)),
                     SizedBox(height: 14),
                     Text(
                       'Create New Task',
@@ -81,9 +72,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     Text(
                       'Add a title and optional description.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF6B7280),
-                      ),
+                      style: TextStyle(color: Color(0xFF6B7280)),
                     ),
                   ],
                 ),

@@ -10,10 +10,7 @@ void main() {
 class MyApp extends StatefulWidget {
   final bool resetTasksOnStart;
 
-  const MyApp({
-    super.key,
-    this.resetTasksOnStart = false,
-  });
+  const MyApp({super.key, this.resetTasksOnStart = false});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -128,10 +125,7 @@ class _MyAppState extends State<MyApp> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(
-              color: Color(0xFF6C63FF),
-              width: 1.6,
-            ),
+            borderSide: const BorderSide(color: Color(0xFF6C63FF), width: 1.6),
           ),
         ),
       ),
