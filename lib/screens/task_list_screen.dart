@@ -27,9 +27,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => AddTaskScreen(
-          onAddTask: widget.onAddTask,
-        ),
+        builder: (_) => AddTaskScreen(onAddTask: widget.onAddTask),
       ),
     ).then((_) {
       setState(() {});
@@ -65,9 +63,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: const Key('task_list_screen'),
-      appBar: AppBar(
-        title: const Text('Tasks'),
-      ),
+      appBar: AppBar(title: const Text('Tasks')),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('floating_add_task_button'),
         onPressed: () => openAddTask(context),
@@ -106,61 +102,64 @@ class _TaskListScreenState extends State<TaskListScreen> {
               itemBuilder: (context, index) {
                 final task = widget.tasks[index];
 
-                return Container(
-                  key: Key('task_card_$index'),
-                  margin: const EdgeInsets.only(bottom: 14),
-                  decoration: BoxDecoration(
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Material(
+                    key: Key('task_card_$index'),
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
-                  ),
-                  child: ListTile(
-                    key: Key('task_tile_$index'),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      side: const BorderSide(color: Color(0xFFE5E7EB)),
                     ),
-                    leading: Checkbox(
-                      key: Key('task_checkbox_$index'),
-                      value: task.isCompleted,
-                      activeColor: const Color(0xFF00BFA6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                    clipBehavior: Clip.antiAlias,
+                    child: ListTile(
+                      key: Key('task_tile_$index'),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
                       ),
-                      onChanged: (_) => toggleTask(index),
-                    ),
-                    title: Text(
-                      task.title,
-                      key: Key('task_title_$index'),
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        decoration: task.isCompleted
-                            ? TextDecoration.lineThrough
-                            : TextDecoration.none,
+                      leading: Checkbox(
+                        key: Key('task_checkbox_$index'),
+                        value: task.isCompleted,
+                        activeColor: const Color(0xFF00BFA6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        onChanged: (_) => toggleTask(index),
                       ),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        task.isCompleted ? 'Completed' : 'Pending',
-                        key: Key('task_status_$index'),
+                      title: Text(
+                        task.title,
+                        key: Key('task_title_$index'),
                         style: TextStyle(
-                          color: task.isCompleted
-                              ? const Color(0xFF00BFA6)
-                              : const Color(0xFFFF9800),
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
+                          decoration: task.isCompleted
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
                         ),
                       ),
-                    ),
-                    trailing: IconButton(
-                      key: Key('delete_task_button_$index'),
-                      icon: const Icon(
-                        Icons.delete_outline,
-                        color: Color(0xFFE53935),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          task.isCompleted ? 'Completed' : 'Pending',
+                          key: Key('task_status_$index'),
+                          style: TextStyle(
+                            color: task.isCompleted
+                                ? const Color(0xFF00BFA6)
+                                : const Color(0xFFFF9800),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
-                      onPressed: () => deleteTask(index),
+                      trailing: IconButton(
+                        key: Key('delete_task_button_$index'),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFE53935),
+                        ),
+                        onPressed: () => deleteTask(index),
+                      ),
+                      onTap: () => openTaskDetails(context, index),
                     ),
-                    onTap: () => openTaskDetails(context, index),
                   ),
                 );
               },
