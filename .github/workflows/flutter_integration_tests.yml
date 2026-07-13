@@ -37,11 +37,8 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Install CocoaPods dependencies
-        run: |
-          cd ios
-          pod install
-          cd ..
+      - name: Prepare iOS project
+        run: flutter build ios --simulator --config-only
 
       - name: Run Flutter analyzer
         run: flutter analyze
