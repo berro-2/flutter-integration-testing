@@ -1,3 +1,4 @@
+
 name: Flutter Integration Tests
 
 on:
@@ -7,7 +8,8 @@ on:
     branches: [main]
 
 jobs:
-  integration-tests:
+  android-integration-tests:
+    name: Android Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -17,7 +19,8 @@ jobs:
 
       - name: Enable KVM
         run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
@@ -42,10 +45,26 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Check Dart formatting
+        run: dart format --output=none --set-exit-if-changed .
+
       - name: Run Flutter analyzer
         run: flutter analyze
 
-      - name: Run integration tests on Android emulator
+      - name: Validate Android release build
+        run: flutter build appbundle --release
+
+      - name: Clean previous Android reports
+        run: |
+          rm -rf test_reports
+          rm -rf test_reports_android
+          rm -f test_results.json
+          rm -f android_test_results.json
+
+          mkdir -p test_reports
+          mkdir -p test_reports_android
+
+      - name: Run Android integration tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
@@ -56,33 +75,175 @@ jobs:
           ram-size: 2048M
           heap-size: 512M
           disable-animations: true
-          emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -no-metrics
-          script: bash -lc 'set -o pipefail; flutter devices; timeout 20m flutter test integration_test/task_test.dart -d emulator-5554 --machine | tee test_results.json'
+          emulator-options: >-
+            -no-window
+            -no-audio
+            -no-boot-anim
+            -no-snapshot
+            -gpu swiftshader_indirect
+            -no-metrics
+          script: bash -lc 'set -o pipefail; flutter devices; timeout 20m flutter test integration_test/task_test.dart -d emulator-5554 --machine | tee android_test_results.json'
 
-      - name: Generate HTML report
+      - name: Generate Android HTML report
         if: always()
         run: |
-          if [ -s test_results.json ] && [ -f generate_report.py ]; then
-            mkdir -p test_reports
+          rm -rf test_reports
+          mkdir -p test_reports
+
+          if [ -s android_test_results.json ] && [ -f generate_report.py ]; then
+            cp android_test_results.json test_results.json
             python3 generate_report.py
+
+            if [ -d test_reports ]; then
+              cp -R test_reports/. test_reports_android/
+            fi
           else
-            echo "test_results.json or generate_report.py was not found."
+            echo "Android test results or report generator not found."
           fi
 
-      - name: Upload HTML report
+      - name: Upload Android HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-html-report
-          path: test_reports/
+          name: android-html-report
+          path: test_reports_android/
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload test result JSON
+      - name: Upload Android JSON results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-test-results
-          path: test_results.json
+          name: android-test-results
+          path: android_test_results.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Android App Bundle
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: warn
+          retention-days: 14
+
+  ios-integration-tests:
+    name: iOS Integration Tests
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check Dart formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Flutter analyzer
+        run: flutter analyze
+
+      - name: Prepare iOS project
+        run: flutter build ios --simulator --config-only
+
+      - name: Validate iOS release build
+        run: flutter build ios --release --no-codesign
+
+      - name: Clean previous iOS reports
+        run: |
+          rm -rf test_reports
+          rm -rf test_reports_ios
+          rm -f test_results.json
+          rm -f ios_test_results.json
+
+          mkdir -p test_reports
+          mkdir -p test_reports_ios
+
+      - name: Start iPhone Simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          DEVICE_ID="$(
+            xcrun simctl list devices available |
+            grep -E 'iPhone (16|15|14)' |
+            head -n 1 |
+            sed -E 's/.*\(([0-9A-F-]+)\).*/\1/'
+          )"
+
+          if [ -z "$DEVICE_ID" ]; then
+            echo "No available iPhone Simulator was found."
+            xcrun simctl list devices available
+            exit 1
+          fi
+
+          echo "Using simulator: $DEVICE_ID"
+          echo "device_id=$DEVICE_ID" >> "$GITHUB_OUTPUT"
+
+          xcrun simctl boot "$DEVICE_ID" || true
+          open -a Simulator
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+
+      - name: Verify iOS device
+        run: |
+          flutter devices
+          flutter devices --device-timeout 60
+
+      - name: Run iOS integration tests
+        shell: bash
+        run: |
+          set -o pipefail
+
+          flutter test integration_test/task_test.dart \
+            -d "${{ steps.simulator.outputs.device_id }}" \
+            --machine | tee ios_test_results.json
+
+      - name: Generate iOS HTML report
+        if: always()
+        run: |
+          rm -rf test_reports
+          mkdir -p test_reports
+
+          if [ -s ios_test_results.json ] && [ -f generate_report.py ]; then
+            cp ios_test_results.json test_results.json
+            python3 generate_report.py
+
+            if [ -d test_reports ]; then
+              cp -R test_reports/. test_reports_ios/
+            fi
+          else
+            echo "iOS test results or report generator not found."
+          fi
+
+      - name: Upload iOS HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-html-report
+          path: test_reports_ios/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload iOS JSON results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: ios_test_results.json
           if-no-files-found: warn
           retention-days: 14

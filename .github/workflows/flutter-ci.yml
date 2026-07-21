@@ -1,0 +1,38 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  android:
+    name: Android
+    uses: ./.github/workflows/android-tests.yml
+
+  ios:
+    name: iOS
+    uses: ./.github/workflows/ios-tests.yml
+
+  all-tests-passed:
+    name: All Mobile Tests Passed
+    needs:
+      - android
+      - ios
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Verify platform results
+        run: |
+          echo "Android: ${{ needs.android.result }}"
+          echo "iOS: ${{ needs.ios.result }}"
+
+          if [ "${{ needs.android.result }}" != "success" ] || \
+             [ "${{ needs.ios.result }}" != "success" ]; then
+            echo "At least one platform failed."
+            exit 1
+          fi
+
+          echo "Android and iOS passed."

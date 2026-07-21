@@ -1,0 +1,118 @@
+name: Android Tests
+
+on:
+  workflow_call:
+
+jobs:
+  android-integration-tests:
+    name: Android Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check Dart formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Flutter analyzer
+        run: flutter analyze
+
+      - name: Validate Android release build
+        run: flutter build appbundle --release
+
+      - name: Clean previous reports
+        run: |
+          rm -rf test_reports test_reports_android
+          rm -f test_results.json android_test_results.json
+          mkdir -p test_reports test_reports_android
+
+      - name: Run Android integration tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          disable-animations: true
+          emulator-options: >-
+            -no-window
+            -no-audio
+            -no-boot-anim
+            -no-snapshot
+            -gpu swiftshader_indirect
+            -no-metrics
+          script: bash -lc 'set -o pipefail; flutter devices; timeout 20m flutter test integration_test/task_test.dart -d emulator-5554 --machine | tee android_test_results.json'
+
+      - name: Generate Android HTML report
+        if: always()
+        run: |
+          rm -rf test_reports
+          mkdir -p test_reports
+
+          if [ -s android_test_results.json ] && [ -f generate_report.py ]; then
+            cp android_test_results.json test_results.json
+            python3 generate_report.py
+            cp -R test_reports/. test_reports_android/
+          else
+            echo "Android test results or report generator not found."
+          fi
+
+      - name: Upload Android HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-html-report
+          path: test_reports_android/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Android JSON results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-results
+          path: android_test_results.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Android App Bundle
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: warn
+          retention-days: 14

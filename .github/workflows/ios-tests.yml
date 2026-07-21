@@ -1,0 +1,118 @@
+name: iOS Tests
+
+on:
+  workflow_call:
+
+jobs:
+  ios-integration-tests:
+    name: iOS Integration Tests
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check Dart formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Flutter analyzer
+        run: flutter analyze
+
+      - name: Prepare iOS project
+        run: flutter build ios --simulator --config-only
+
+      - name: Validate iOS release build
+        run: flutter build ios --release --no-codesign
+
+      - name: Clean previous reports
+        run: |
+          rm -rf test_reports test_reports_ios
+          rm -f test_results.json ios_test_results.json
+          mkdir -p test_reports test_reports_ios
+
+      - name: Start iPhone Simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          DEVICE_ID="$(
+            xcrun simctl list devices available |
+            grep -E 'iPhone (16|15|14)' |
+            head -n 1 |
+            sed -E 's/.*\(([0-9A-F-]+)\).*/\1/'
+          )"
+
+          if [ -z "$DEVICE_ID" ]; then
+            echo "No available iPhone Simulator was found."
+            xcrun simctl list devices available
+            exit 1
+          fi
+
+          echo "Using simulator: $DEVICE_ID"
+          echo "device_id=$DEVICE_ID" >> "$GITHUB_OUTPUT"
+
+          xcrun simctl boot "$DEVICE_ID" || true
+          open -a Simulator
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+
+      - name: Verify iOS device
+        run: |
+          flutter devices
+          flutter devices --device-timeout 60
+
+      - name: Run iOS integration tests
+        shell: bash
+        run: |
+          set -o pipefail
+
+          flutter test integration_test/task_test.dart \
+            -d "${{ steps.simulator.outputs.device_id }}" \
+            --machine | tee ios_test_results.json
+
+      - name: Generate iOS HTML report
+        if: always()
+        run: |
+          rm -rf test_reports
+          mkdir -p test_reports
+
+          if [ -s ios_test_results.json ] && [ -f generate_report.py ]; then
+            cp ios_test_results.json test_results.json
+            python3 generate_report.py
+            cp -R test_reports/. test_reports_ios/
+          else
+            echo "iOS test results or report generator not found."
+          fi
+
+      - name: Upload iOS HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-html-report
+          path: test_reports_ios/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload iOS JSON results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: ios_test_results.json
+          if-no-files-found: warn
+          retention-days: 14
