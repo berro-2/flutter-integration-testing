@@ -33,6 +33,14 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Local presentation generation and preview artifacts
+/.codex_tmp/
+/*.pptx
+*.pptx.inspect.ndjson
+/docs/presentations/*.pptx
+/docs/presentations/rendered/
+~$*.pptx
+
 # Symbolication related
 app.*.symbols
 

@@ -1,7 +1,7 @@
 name: iOS Tests
 
 on:
-  workflow_call:
+  workflow_call: {}
 
 jobs:
   ios-integration-tests:
@@ -147,9 +147,9 @@ jobs:
           rm -rf test_reports
           mkdir -p test_reports
 
-          if [ -s ios_test_results.json ] && [ -f generate_report.py ]; then
-            cp ios_test_results.json test_results.json
-            python3 generate_report.py
+          if [ -s ios_test_results.json ] && [ -f scripts/test_reporting/generate_report.py ]; then
+            cp ios_test_results.json test_reports/test_results.json
+            python3 scripts/test_reporting/generate_report.py
             cp -R test_reports/. test_reports_ios/
           else
             echo "iOS test results or report generator not found."

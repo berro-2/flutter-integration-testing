@@ -84,9 +84,9 @@ jobs:
           rm -rf test_reports
           mkdir -p test_reports
 
-          if [ -s android_test_results.json ] && [ -f generate_report.py ]; then
-            cp android_test_results.json test_results.json
-            python3 generate_report.py
+          if [ -s android_test_results.json ] && [ -f scripts/test_reporting/generate_report.py ]; then
+            cp android_test_results.json test_reports/test_results.json
+            python3 scripts/test_reporting/generate_report.py
             cp -R test_reports/. test_reports_android/
           else
             echo "Android test results or report generator not found."

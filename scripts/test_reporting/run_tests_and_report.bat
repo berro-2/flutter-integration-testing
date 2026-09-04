@@ -1,5 +1,7 @@
 @echo off
-set "PROJECT_DIR=%~dp0"
+set "SCRIPT_DIR=%~dp0"
+for %%I in ("%SCRIPT_DIR%..\..") do set "PROJECT_DIR=%%~fI"
+set "REPORTS_DIR=%PROJECT_DIR%\test_reports"
 set "TEST_FILE=integration_test\task_test.dart"
 set "DEVICE_ID=%~1"
 
@@ -17,13 +19,14 @@ echo.
 
 echo [1/3] Running Flutter integration tests and saving JSON...
 
-call flutter test "%TEST_FILE%" -d %DEVICE_ID% --machine > "%PROJECT_DIR%\test_results.json" 2>&1
+if not exist "%REPORTS_DIR%" mkdir "%REPORTS_DIR%"
+call flutter test "%TEST_FILE%" -d %DEVICE_ID% --machine > "%REPORTS_DIR%\test_results.json" 2>&1
 set "TEST_EXIT_CODE=%ERRORLEVEL%"
 
 echo Integration test command finished.
 echo.
 
-if not exist "%PROJECT_DIR%\test_results.json" (
+if not exist "%REPORTS_DIR%\test_results.json" (
     echo ERROR: test_results.json was not created.
     pause
     exit /b 1
@@ -36,22 +39,22 @@ if not "%TEST_EXIT_CODE%"=="0" (
 )
 
 echo JSON saved successfully:
-echo %PROJECT_DIR%\test_results.json
+echo %REPORTS_DIR%\test_results.json
 echo.
 
 echo [2/3] Generating HTML report...
 
-call py "%PROJECT_DIR%\generate_report.py"
+call py "%SCRIPT_DIR%generate_report.py"
 
 echo.
 
-if not exist "%PROJECT_DIR%\latest_report_name.txt" (
+if not exist "%REPORTS_DIR%\latest_report_name.txt" (
     echo ERROR: latest_report_name.txt was not created.
     pause
     exit /b 1
 )
 
-set /p REPORT_FILE=<"%PROJECT_DIR%\latest_report_name.txt"
+set /p REPORT_FILE=<"%REPORTS_DIR%\latest_report_name.txt"
 
 if not exist "%REPORT_FILE%" (
     echo ERROR: HTML report was not created.

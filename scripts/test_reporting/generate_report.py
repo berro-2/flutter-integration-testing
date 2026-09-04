@@ -3,12 +3,12 @@ import os
 import html as html_escape
 from datetime import datetime
 
-project_dir = os.path.dirname(os.path.abspath(__file__))
-
-input_file = os.path.join(project_dir, "test_results.json")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
 
 reports_folder = os.path.join(project_dir, "test_reports")
 os.makedirs(reports_folder, exist_ok=True)
+input_file = os.path.join(reports_folder, "test_results.json")
 
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 output_file = os.path.join(reports_folder, f"test_report_{timestamp}.html")
@@ -607,7 +607,7 @@ if github_summary_file:
     with open(github_summary_file, "a", encoding="utf-8") as file:
         file.write(markdown_summary)
 
-latest_file = os.path.join(project_dir, "latest_report_name.txt")
+latest_file = os.path.join(reports_folder, "latest_report_name.txt")
 
 with open(latest_file, "w", encoding="utf-8") as file:
     file.write(output_file)
