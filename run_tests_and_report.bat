@@ -1,7 +1,9 @@
 @echo off
-set "PROJECT_DIR=C:\Users\96171\Desktop\flutter\integration_demo_app"
+set "PROJECT_DIR=%~dp0"
 set "TEST_FILE=integration_test\task_test.dart"
-set "DEVICE_ID=emulator-5554"
+set "DEVICE_ID=%~1"
+
+if not defined DEVICE_ID set "DEVICE_ID=windows"
 
 cd /d "%PROJECT_DIR%"
 
@@ -16,14 +18,21 @@ echo.
 echo [1/3] Running Flutter integration tests and saving JSON...
 
 call flutter test "%TEST_FILE%" -d %DEVICE_ID% --machine > "%PROJECT_DIR%\test_results.json" 2>&1
+set "TEST_EXIT_CODE=%ERRORLEVEL%"
 
-echo Flutter test command finished.
+echo Integration test command finished.
 echo.
 
 if not exist "%PROJECT_DIR%\test_results.json" (
     echo ERROR: test_results.json was not created.
     pause
     exit /b 1
+)
+
+if not "%TEST_EXIT_CODE%"=="0" (
+    echo WARNING: Flutter tests failed with exit code %TEST_EXIT_CODE%.
+    echo The HTML report will still be generated with the failure details.
+    echo.
 )
 
 echo JSON saved successfully:
@@ -63,3 +72,4 @@ start "" "%REPORT_FILE%"
 echo.
 echo Done.
 pause
+exit /b %TEST_EXIT_CODE%
