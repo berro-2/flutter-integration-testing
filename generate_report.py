@@ -134,6 +134,10 @@ with open(input_file, "r", encoding="utf-8", errors="ignore") as file:
             error_text = f"{message}\n{stack_trace}"
             error_logs.append(error_text)
 
+            test_id = data.get("testID")
+            if test_id in tests:
+                tests[test_id]["logs"].append(error_text)
+
         elif event_type == "done":
             final_success = data.get("success", False)
             total_time = data.get("time", 0)
@@ -162,6 +166,80 @@ failed_tests = len(failed_tests_list)
 
 status_text = "PASSED" if final_success else "FAILED"
 status_class = "passed" if final_success else "failed"
+platform_name = os.environ.get("TEST_PLATFORM", "Flutter")
+
+
+def markdown_text(value):
+    return str(value).replace("|", "\\|").replace("\r", " ").replace("\n", " ")
+
+
+def build_markdown_summary():
+    status_icon = "✅" if final_success else "❌"
+    lines = [
+        f"## {platform_name} integration tests",
+        "",
+        f"### {status_icon} Overall result: {status_text}",
+        "",
+        "| Total | Passed | Failed | Duration |",
+        "| ---: | ---: | ---: | ---: |",
+        (
+            f"| {total_tests} | {passed_tests} | {failed_tests} | "
+            f"{round(total_time / 1000, 2)}s |"
+        ),
+        "",
+        "### Test results",
+        "",
+        "| Test | Result | Duration |",
+        "| --- | :---: | ---: |",
+    ]
+
+    if visible_tests:
+        for test in visible_tests:
+            display_result = get_display_result(test)
+            result_icon = "✅" if display_result == "PASSED" else "❌"
+            duration_ms = test["duration"] if test["duration"] is not None else 0
+            lines.append(
+                f"| {markdown_text(test['name'])} | "
+                f"{result_icon} {display_result} | {round(duration_ms / 1000, 2)}s |"
+            )
+    else:
+        lines.append("| No completed test cases were recorded. | ❌ FAILED | — |")
+
+    if failed_tests_list:
+        lines.extend(["", "### Failure details", ""])
+
+        for test in failed_tests_list:
+            logs = "\n".join(test.get("logs", [])).strip()
+            if not logs:
+                logs = "No per-test failure output was recorded. Check the job log."
+
+            # Keep the Actions summary useful without approaching GitHub's size limit.
+            logs = logs[-12000:]
+            lines.extend(
+                [
+                    "<details>",
+                    f"<summary>{safe_text(test['name'])}</summary>",
+                    "",
+                    f"<pre>{safe_text(logs)}</pre>",
+                    "</details>",
+                    "",
+                ]
+            )
+
+    if not final_success and error_logs:
+        combined_errors = "\n\n".join(error_logs)[-12000:]
+        lines.extend(
+            [
+                "<details>",
+                "<summary>All captured errors</summary>",
+                "",
+                f"<pre>{safe_text(combined_errors)}</pre>",
+                "</details>",
+                "",
+            ]
+        )
+
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def build_test_rows(test_list):
@@ -518,9 +596,21 @@ html = f"""
 with open(output_file, "w", encoding="utf-8") as file:
     file.write(html)
 
+markdown_summary = build_markdown_summary()
+summary_output_file = os.path.join(reports_folder, "test_summary.md")
+
+with open(summary_output_file, "w", encoding="utf-8") as file:
+    file.write(markdown_summary)
+
+github_summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+if github_summary_file:
+    with open(github_summary_file, "a", encoding="utf-8") as file:
+        file.write(markdown_summary)
+
 latest_file = os.path.join(project_dir, "latest_report_name.txt")
 
 with open(latest_file, "w", encoding="utf-8") as file:
     file.write(output_file)
 
 print(f"HTML report generated: {output_file}")
+print(f"Markdown summary generated: {summary_output_file}")

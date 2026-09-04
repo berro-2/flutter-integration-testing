@@ -78,6 +78,8 @@ jobs:
 
       - name: Generate Android HTML report
         if: always()
+        env:
+          TEST_PLATFORM: Android
         run: |
           rm -rf test_reports
           mkdir -p test_reports
@@ -88,6 +90,13 @@ jobs:
             cp -R test_reports/. test_reports_android/
           else
             echo "Android test results or report generator not found."
+            {
+              echo "## Android integration tests"
+              echo
+              echo "### ❌ Overall result: FAILED"
+              echo
+              echo "No machine-readable test results were produced. Check the Android job log for the startup or infrastructure failure."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload Android HTML report

@@ -141,6 +141,8 @@ jobs:
 
       - name: Generate iOS HTML report
         if: always()
+        env:
+          TEST_PLATFORM: iOS
         run: |
           rm -rf test_reports
           mkdir -p test_reports
@@ -151,6 +153,13 @@ jobs:
             cp -R test_reports/. test_reports_ios/
           else
             echo "iOS test results or report generator not found."
+            {
+              echo "## iOS integration tests"
+              echo
+              echo "### ❌ Overall result: FAILED"
+              echo
+              echo "No machine-readable test results were produced. Check the iOS job log for the startup or infrastructure failure."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload iOS HTML report
