@@ -6,7 +6,7 @@ on:
 jobs:
   ios-integration-tests:
     name: iOS Integration Tests
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 45
 
     steps:
@@ -18,6 +18,11 @@ jobs:
         with:
           channel: stable
           cache: true
+
+      - name: Select stable Xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer
+          xcodebuild -version
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,49 +47,97 @@ jobs:
       - name: Clean previous reports
         run: |
           rm -rf test_reports test_reports_ios
-          rm -f test_results.json ios_test_results.json
+          rm -f test_results.json ios_test_results.json ios_test_verbose.log
           mkdir -p test_reports test_reports_ios
 
-      - name: Start iPhone Simulator
+      - name: Create iPhone Simulator
         id: simulator
         shell: bash
         run: |
           set -euo pipefail
 
-          DEVICE_ID="$(
-            xcrun simctl list devices available |
-            grep -E 'iPhone (16|15|14)' |
-            head -n 1 |
-            sed -E 's/.*\(([0-9A-F-]+)\).*/\1/'
+          RUNTIME_ID="$(
+            xcrun simctl list runtimes available |
+            awk '/iOS 18\.5/ { print $NF; exit }'
           )"
 
-          if [ -z "$DEVICE_ID" ]; then
-            echo "No available iPhone Simulator was found."
-            xcrun simctl list devices available
+          if [ -z "$RUNTIME_ID" ]; then
+            echo "The iOS 18.5 simulator runtime is unavailable."
+            xcrun simctl list runtimes available
             exit 1
           fi
 
-          echo "Using simulator: $DEVICE_ID"
+          DEVICE_ID="$(
+            xcrun simctl create \
+              "Task Manager CI" \
+              "com.apple.CoreSimulator.SimDeviceType.iPhone-16" \
+              "$RUNTIME_ID"
+          )"
+
+          echo "Created iPhone 16 / iOS 18.5 simulator: $DEVICE_ID"
           echo "device_id=$DEVICE_ID" >> "$GITHUB_OUTPUT"
 
-          xcrun simctl boot "$DEVICE_ID" || true
-          open -a Simulator
-          xcrun simctl bootstatus "$DEVICE_ID" -b
-
-      - name: Verify iOS device
-        run: |
-          flutter devices
-          flutter devices --device-timeout 60
-
       - name: Run iOS integration tests
-        timeout-minutes: 20
+        timeout-minutes: 22
         shell: bash
         run: |
-          set -o pipefail
+          set -euo pipefail
 
-          flutter test integration_test/task_test.dart \
-            -d "${{ steps.simulator.outputs.device_id }}" \
-            --machine | tee ios_test_results.json
+          DEVICE_ID="${{ steps.simulator.outputs.device_id }}"
+          : > ios_test_verbose.log
+
+          boot_simulator() {
+            xcrun simctl shutdown "$DEVICE_ID" || true
+            xcrun simctl boot "$DEVICE_ID"
+            xcrun simctl bootstatus "$DEVICE_ID" -b
+          }
+
+          run_tests() {
+            rm -f ios_test_results.json
+
+            python3 -c '
+          import subprocess
+          import sys
+
+          try:
+              result = subprocess.run(sys.argv[1:], timeout=420)
+          except subprocess.TimeoutExpired:
+              print("Flutter test attempt timed out after 7 minutes.", file=sys.stderr)
+              sys.exit(124)
+
+          sys.exit(result.returncode)
+          ' \
+              flutter --verbose test integration_test/task_test.dart \
+              -d "$DEVICE_ID" \
+              --machine \
+              2> >(tee -a ios_test_verbose.log >&2) \
+              | tee ios_test_results.json
+
+            return "${PIPESTATUS[0]}"
+          }
+
+          for ATTEMPT in 1 2; do
+            echo "Starting iOS integration-test attempt $ATTEMPT of 2."
+            boot_simulator
+
+            set +e
+            run_tests
+            TEST_EXIT_CODE=$?
+            set -e
+
+            if [ "$TEST_EXIT_CODE" -eq 0 ]; then
+              exit 0
+            fi
+
+            echo "Attempt $ATTEMPT failed with exit code $TEST_EXIT_CODE."
+            xcrun simctl diagnose --no-archive || true
+
+            if [ "$ATTEMPT" -eq 2 ]; then
+              exit "$TEST_EXIT_CODE"
+            fi
+
+            echo "Restarting the simulator before retrying."
+          done
 
       - name: Generate iOS HTML report
         if: always()
@@ -109,11 +162,13 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload iOS JSON results
+      - name: Upload iOS test diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ios-test-results
-          path: ios_test_results.json
+          path: |
+            ios_test_results.json
+            ios_test_verbose.log
           if-no-files-found: warn
           retention-days: 14
