@@ -5,14 +5,40 @@ import 'package:integration_demo_app/main.dart' as app;
 class TaskTestDriver {
   TaskTestDriver(this.tester);
 
+  static const _pollInterval = Duration(milliseconds: 100);
+  static const _maximumPolls = 20;
+
   final WidgetTester tester;
+
+  Future<void> _settle() async {
+    for (var attempt = 0; attempt < _maximumPolls; attempt++) {
+      await tester.pump(_pollInterval);
+      if (!tester.binding.hasScheduledFrame) {
+        return;
+      }
+    }
+  }
+
+  Future<void> _waitUntil(
+    bool Function() condition, {
+    required String failureReason,
+  }) async {
+    for (var attempt = 0; attempt < _maximumPolls; attempt++) {
+      if (condition()) {
+        return;
+      }
+      await tester.pump(_pollInterval);
+    }
+
+    expect(condition(), isTrue, reason: failureReason);
+  }
 
   Future<void> startApp() async {
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpAndSettle();
+    await _settle();
 
     await tester.pumpWidget(app.MyApp(key: UniqueKey()));
-    await tester.pumpAndSettle();
+    await _settle();
 
     expect(
       find.byKey(const Key('dashboard_screen')).hitTestable(),
@@ -33,17 +59,17 @@ class TaskTestDriver {
     );
 
     await tester.ensureVisible(finder);
-    await tester.pumpAndSettle();
+    await _settle();
 
-    final hitTestableFinder = finder.hitTestable();
-    expect(
-      hitTestableFinder,
-      findsOneWidget,
-      reason: 'The target widget is not visible or cannot receive taps.',
+    await _waitUntil(
+      () => finder.hitTestable().evaluate().length == 1,
+      failureReason:
+          'The target widget did not become visible and tappable within '
+          '${_maximumPolls * _pollInterval.inMilliseconds} ms.',
     );
 
-    await tester.tap(hitTestableFinder);
-    await tester.pumpAndSettle();
+    await tester.tap(finder.hitTestable());
+    await _settle();
   }
 
   Future<void> dismissKeyboard() async {
@@ -51,7 +77,14 @@ class TaskTestDriver {
     if (tester.testTextInput.isRegistered) {
       tester.testTextInput.hide();
     }
-    await tester.pump();
+
+    await _waitUntil(
+      () => tester.view.viewInsets.bottom == 0,
+      failureReason:
+          'The software keyboard did not close within '
+          '${_maximumPolls * _pollInterval.inMilliseconds} ms.',
+    );
+    await _settle();
   }
 
   Future<void> openAddTask() async {
@@ -77,10 +110,11 @@ class TaskTestDriver {
       find.byKey(const Key('save_task_button')),
       dismissKeyboardFirst: true,
     );
-    expect(
-      find.byKey(const Key('dashboard_screen')).hitTestable(),
-      findsOneWidget,
-      reason: 'Saving a task should return to the Dashboard.',
+
+    final dashboard = find.byKey(const Key('dashboard_screen'));
+    await _waitUntil(
+      () => dashboard.hitTestable().evaluate().length == 1,
+      failureReason: 'Saving a task did not return to the visible Dashboard.',
     );
   }
 
@@ -96,7 +130,7 @@ class TaskTestDriver {
 
   Future<void> goBack() async {
     await tester.pageBack();
-    await tester.pumpAndSettle();
+    await _settle();
   }
 
   void expectKeyedText(String key, String expectedText) {
