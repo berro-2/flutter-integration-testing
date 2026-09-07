@@ -1,7 +1,12 @@
 name: iOS Tests
 
 on:
-  workflow_call: {} 
+  workflow_call:
+    secrets:
+      DEMO_LOGIN_USERNAME:
+        required: true
+      DEMO_LOGIN_PASSWORD:
+        required: true
 
 jobs:
   ios-integration-tests:
@@ -81,6 +86,9 @@ jobs:
       - name: Run iOS integration tests
         timeout-minutes: 22
         shell: bash
+        env:
+          DEMO_LOGIN_USERNAME: ${{ secrets.DEMO_LOGIN_USERNAME }}
+          DEMO_LOGIN_PASSWORD: ${{ secrets.DEMO_LOGIN_PASSWORD }}
         run: bash scripts/ci/run_ios_tests.sh "${{ steps.simulator.outputs.device_id }}"
 
       - name: Generate iOS HTML report

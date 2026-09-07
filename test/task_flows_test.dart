@@ -3,11 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../integration_test/suites/completion_statistics_suite.dart';
 import '../integration_test/suites/dashboard_navigation_suite.dart';
+import '../integration_test/suites/login_suite.dart';
 import '../integration_test/suites/task_crud_suite.dart';
 import '../integration_test/support/task_test_driver.dart';
 
 void main() {
   // Reuse the device scenarios for fast checks of the driver and UI assertions.
+  registerLoginSuite();
   registerDashboardNavigationSuite();
   registerTaskCrudSuite();
   registerCompletionStatisticsSuite();

@@ -1,7 +1,12 @@
 name: Android Tests
 
 on:
-  workflow_call: {}
+  workflow_call:
+    secrets:
+      DEMO_LOGIN_USERNAME:
+        required: true
+      DEMO_LOGIN_PASSWORD:
+        required: true
 
 jobs:
   android-integration-tests:
@@ -52,7 +57,7 @@ jobs:
         run: python3 -m unittest discover -s scripts/test_reporting -p test_generate_report.py -v
 
       - name: Check retry orchestration
-        run: python3 -m unittest discover -s scripts/ci -p test_retry.py -v
+        run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
 
       - name: Run widget regression tests
         run: flutter test test
@@ -68,6 +73,9 @@ jobs:
 
       - name: Run Android integration tests
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          DEMO_LOGIN_USERNAME: ${{ secrets.DEMO_LOGIN_USERNAME }}
+          DEMO_LOGIN_PASSWORD: ${{ secrets.DEMO_LOGIN_PASSWORD }}
         with:
           api-level: 30
           target: google_apis

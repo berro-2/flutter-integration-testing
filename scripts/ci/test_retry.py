@@ -12,6 +12,10 @@ flutter() { echo 'Flutter fixture'; }
 xcodebuild() { echo 'Xcode fixture'; }
 xcrun() { echo 'Simulator fixture'; }
 python3() {
+  if [ "$1" = scripts/ci/create_demo_credentials.py ]; then
+    echo '{}' > "$2"
+    return 0
+  fi
   if [ "$1" = scripts/ci/run_with_timeout.py ]; then
     echo "attempt $attempt"
     echo "diagnostic $attempt" >&2

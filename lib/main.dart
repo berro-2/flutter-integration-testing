@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'config/demo_credentials.dart';
 import 'models/task.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +20,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final List<Task> tasks = [];
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
@@ -63,6 +66,11 @@ class _MyAppState extends State<MyApp> {
 
   int get pendingTasks {
     return tasks.where((task) => !task.isCompleted).length;
+  }
+
+  Future<bool> authenticate(String username, String password) async {
+    return username == DemoCredentials.username &&
+        password == DemoCredentials.password;
   }
 
   @override
@@ -129,14 +137,19 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
       ),
-      home: DashboardScreen(
-        tasks: tasks,
-        completedTasks: completedTasks,
-        pendingTasks: pendingTasks,
-        onAddTask: addTask,
-        onToggleTask: toggleTask,
-        onDeleteTask: deleteTask,
-      ),
+      home: _isAuthenticated
+          ? DashboardScreen(
+              tasks: tasks,
+              completedTasks: completedTasks,
+              pendingTasks: pendingTasks,
+              onAddTask: addTask,
+              onToggleTask: toggleTask,
+              onDeleteTask: deleteTask,
+            )
+          : LoginScreen(
+              authenticate: authenticate,
+              onLogin: () => setState(() => _isAuthenticated = true),
+            ),
     );
   }
 }

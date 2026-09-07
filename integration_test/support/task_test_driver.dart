@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_demo_app/main.dart' as app;
+import 'package:integration_demo_app/config/demo_credentials.dart';
 
 class TaskTestDriver {
   TaskTestDriver(this.tester);
@@ -40,6 +41,20 @@ class TaskTestDriver {
   }
 
   Future<void> startApp() async {
+    await launchApp();
+    await login();
+  }
+
+  Future<void> launchApp() async {
+    if (DemoCredentials.requireInjected) {
+      expect(
+        DemoCredentials.isConfigured,
+        isTrue,
+        reason:
+            'CI requires DEMO_LOGIN_USERNAME and DEMO_LOGIN_PASSWORD to be '
+            'injected with --dart-define-from-file.',
+      );
+    }
     await tester.pumpWidget(const SizedBox.shrink());
     await _settle();
 
@@ -47,10 +62,36 @@ class TaskTestDriver {
     await _settle();
 
     expect(
-      find.byKey(const Key('dashboard_screen')).hitTestable(),
+      find.byKey(const Key('login_screen')).hitTestable(),
       findsOneWidget,
-      reason: 'Each test should start on the visible Dashboard screen.',
+      reason: 'Each test should start on the visible Login screen.',
     );
+  }
+
+  Future<void> login({
+    String username = DemoCredentials.username,
+    String password = DemoCredentials.password,
+  }) async {
+    await tester.enterText(
+      find.byKey(const Key('login_username_input')),
+      username,
+    );
+    await tester.enterText(
+      find.byKey(const Key('login_password_input')),
+      password,
+    );
+    await tap(
+      find.byKey(const Key('login_submit_button')),
+      dismissKeyboardFirst: true,
+    );
+    if (username == DemoCredentials.username &&
+        password == DemoCredentials.password) {
+      expect(
+        find.byKey(const Key('dashboard_screen')).hitTestable(),
+        findsOneWidget,
+        reason: 'Valid demo credentials should open the Dashboard.',
+      );
+    }
   }
 
   Future<void> tap(Finder finder, {bool dismissKeyboardFirst = false}) async {

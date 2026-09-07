@@ -3,6 +3,9 @@ set -euo pipefail
 
 device_id="${1:?Simulator device ID is required}"
 mkdir -p ios_diagnostics
+credentials_file="${RUNNER_TEMP:-.}/demo-login-credentials.json"
+trap 'rm -f "$credentials_file"' EXIT
+python3 scripts/ci/create_demo_credentials.py "$credentials_file"
 flutter --version > ios_diagnostics/flutter-version.txt 2>&1
 xcodebuild -version > ios_diagnostics/xcode-version.txt 2>&1
 
@@ -20,7 +23,7 @@ for attempt in 1 2; do
   set +e
   python3 scripts/ci/run_with_timeout.py 420 \
     flutter --verbose test integration_test/task_test.dart \
-    -d "$device_id" --machine \
+    -d "$device_id" --machine --dart-define-from-file="$credentials_file" \
     > "$attempt_dir/test_results.json" 2> "$attempt_dir/verbose.log"
   test_exit_code=$?
   set -e
