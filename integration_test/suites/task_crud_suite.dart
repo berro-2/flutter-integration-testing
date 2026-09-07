@@ -13,9 +13,9 @@ void registerTaskCrudSuite() {
         description: 'Create integration test demo with multiple screens',
       );
 
-      driver.expectKeyedText('dashboard_total_tasks', 'Total Tasks: 1');
-      driver.expectKeyedText('dashboard_completed_tasks', 'Completed: 0');
-      driver.expectKeyedText('dashboard_pending_tasks', 'Pending: 1');
+      driver.expectKeyedText('dashboard_total_tasks', '1');
+      driver.expectKeyedText('dashboard_completed_tasks', '0');
+      driver.expectKeyedText('dashboard_pending_tasks', '1');
     });
 
     testWidgets('uses a fallback when description is omitted', (tester) async {

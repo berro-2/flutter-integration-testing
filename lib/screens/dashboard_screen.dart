@@ -140,6 +140,7 @@ class DashboardScreen extends StatelessWidget {
                   Expanded(
                     child: _StatCard(
                       title: 'Total',
+                      valueKey: const Key('dashboard_total_tasks'),
                       value: '${tasks.length}',
                       icon: Icons.list_alt,
                       color: const Color(0xFF6C63FF),
@@ -149,6 +150,7 @@ class DashboardScreen extends StatelessWidget {
                   Expanded(
                     child: _StatCard(
                       title: 'Done',
+                      valueKey: const Key('dashboard_completed_tasks'),
                       value: '$completedTasks',
                       icon: Icons.check_circle,
                       color: const Color(0xFF00BFA6),
@@ -158,6 +160,7 @@ class DashboardScreen extends StatelessWidget {
                   Expanded(
                     child: _StatCard(
                       title: 'Pending',
+                      valueKey: const Key('dashboard_pending_tasks'),
                       value: '$pendingTasks',
                       icon: Icons.schedule,
                       color: const Color(0xFFFFB020),
@@ -167,32 +170,6 @@ class DashboardScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 20),
-
-              // Keep these hidden-ish test texts so tests still work.
-              Offstage(
-                offstage: false,
-                child: Column(
-                  children: [
-                    Text(
-                      'Total Tasks: ${tasks.length}',
-                      key: const Key('dashboard_total_tasks'),
-                      style: const TextStyle(fontSize: 0),
-                    ),
-                    Text(
-                      'Completed: $completedTasks',
-                      key: const Key('dashboard_completed_tasks'),
-                      style: const TextStyle(fontSize: 0),
-                    ),
-                    Text(
-                      'Pending: $pendingTasks',
-                      key: const Key('dashboard_pending_tasks'),
-                      style: const TextStyle(fontSize: 0),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 10),
 
               _ActionButton(
                 keyValue: 'open_task_list_button',
@@ -232,12 +209,14 @@ class DashboardScreen extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   final String title;
   final String value;
+  final Key valueKey;
   final IconData icon;
   final Color color;
 
   const _StatCard({
     required this.title,
     required this.value,
+    required this.valueKey,
     required this.icon,
     required this.color,
   });
@@ -257,6 +236,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             value,
+            key: valueKey,
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,

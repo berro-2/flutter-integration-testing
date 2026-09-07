@@ -17,6 +17,12 @@ class TaskTestDriver {
         return;
       }
     }
+    fail(
+      'UI did not settle after $_maximumPolls pumps '
+      '(${_maximumPolls * _pollInterval.inMilliseconds} ms of frame waits). '
+      'Frames are still scheduled; check for a continuous animation or '
+      'an unfinished transition.',
+    );
   }
 
   Future<void> _waitUntil(

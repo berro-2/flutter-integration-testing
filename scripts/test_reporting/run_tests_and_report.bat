@@ -1,4 +1,5 @@
 @echo off
+setlocal
 set "SCRIPT_DIR=%~dp0"
 for %%I in ("%SCRIPT_DIR%..\..") do set "PROJECT_DIR=%%~fI"
 set "REPORTS_DIR=%PROJECT_DIR%\test_reports"
@@ -44,7 +45,13 @@ echo.
 
 echo [2/3] Generating HTML report...
 
+set "TEST_PROCESS_EXIT_CODE=%TEST_EXIT_CODE%"
+set "TEST_PASSED_ON_RETRY="
 call py "%SCRIPT_DIR%generate_report.py"
+if errorlevel 1 (
+    echo ERROR: Report generation failed. No report will be opened.
+    exit /b 1
+)
 
 echo.
 
@@ -54,6 +61,7 @@ if not exist "%REPORTS_DIR%\latest_report_name.txt" (
     exit /b 1
 )
 
+set "REPORT_FILE="
 set /p REPORT_FILE=<"%REPORTS_DIR%\latest_report_name.txt"
 
 if not exist "%REPORT_FILE%" (

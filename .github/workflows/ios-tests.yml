@@ -16,6 +16,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.41.4'
           channel: stable
           cache: true
 
@@ -80,64 +81,7 @@ jobs:
       - name: Run iOS integration tests
         timeout-minutes: 22
         shell: bash
-        run: |
-          set -euo pipefail
-
-          DEVICE_ID="${{ steps.simulator.outputs.device_id }}"
-          : > ios_test_verbose.log
-
-          boot_simulator() {
-            xcrun simctl shutdown "$DEVICE_ID" || true
-            xcrun simctl boot "$DEVICE_ID"
-            xcrun simctl bootstatus "$DEVICE_ID" -b
-          }
-
-          run_tests() {
-            rm -f ios_test_results.json
-
-            python3 -c '
-          import subprocess
-          import sys
-
-          try:
-              result = subprocess.run(sys.argv[1:], timeout=420)
-          except subprocess.TimeoutExpired:
-              print("Flutter test attempt timed out after 7 minutes.", file=sys.stderr)
-              sys.exit(124)
-
-          sys.exit(result.returncode)
-          ' \
-              flutter --verbose test integration_test/task_test.dart \
-              -d "$DEVICE_ID" \
-              --machine \
-              2> >(tee -a ios_test_verbose.log >&2) \
-              | tee ios_test_results.json
-
-            return "${PIPESTATUS[0]}"
-          }
-
-          for ATTEMPT in 1 2; do
-            echo "Starting iOS integration-test attempt $ATTEMPT of 2."
-            boot_simulator
-
-            set +e
-            run_tests
-            TEST_EXIT_CODE=$?
-            set -e
-
-            if [ "$TEST_EXIT_CODE" -eq 0 ]; then
-              exit 0
-            fi
-
-            echo "Attempt $ATTEMPT failed with exit code $TEST_EXIT_CODE."
-            xcrun simctl diagnose --no-archive || true
-
-            if [ "$ATTEMPT" -eq 2 ]; then
-              exit "$TEST_EXIT_CODE"
-            fi
-
-            echo "Restarting the simulator before retrying."
-          done
+        run: bash scripts/ci/run_ios_tests.sh "${{ steps.simulator.outputs.device_id }}"
 
       - name: Generate iOS HTML report
         if: always()
@@ -179,5 +123,6 @@ jobs:
           path: |
             ios_test_results.json
             ios_test_verbose.log
+            ios_diagnostics/
           if-no-files-found: warn
           retention-days: 14

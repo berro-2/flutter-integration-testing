@@ -6,15 +6,20 @@ from datetime import datetime
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
 
-reports_folder = os.path.join(project_dir, "test_reports")
+reports_folder = os.path.abspath(os.environ.get("TEST_REPORTS_DIR", os.path.join(project_dir, "test_reports")))
 os.makedirs(reports_folder, exist_ok=True)
+latest_file = os.path.join(reports_folder, "latest_report_name.txt")
+# A failed generation must never leave a pointer to a previous run.
+if os.path.exists(latest_file):
+    os.remove(latest_file)
 input_file = os.path.join(reports_folder, "test_results.json")
 
-timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S_%f")
 output_file = os.path.join(reports_folder, f"test_report_{timestamp}.html")
 
 tests = {}
 final_success = False
+run_completed = False
 total_time = 0
 raw_logs = []
 error_logs = []
@@ -27,19 +32,19 @@ def safe_text(value):
 def get_display_result(test):
     result = test.get("result", "unknown")
 
-    if result == "success" and not test.get("skipped", False):
+    if test.get("skipped", False):
+        return "SKIPPED"
+    if test.get("has_error", False) or result in ("failure", "error"):
+        return "FAILED"
+    if result == "success":
         return "PASSED"
-
-    return "FAILED"
+    return "INTERRUPTED"
 
 
 def get_row_class(test):
     display = get_display_result(test)
 
-    if display == "PASSED":
-        return "passed-row"
-
-    return "failed-row"
+    return display.lower() + "-row"
 
 
 with open(input_file, "r", encoding="utf-8", errors="ignore") as file:
@@ -82,12 +87,12 @@ with open(input_file, "r", encoding="utf-8", errors="ignore") as file:
             test_id = test.get("id")
             test_name = test.get("name")
 
-            if test_id and test_name and not test.get("metadata", {}).get("skip", False):
+            if test_id is not None and test_name:
                 tests[test_id] = {
                     "id": test_id,
                     "name": test_name,
                     "result": "running",
-                    "skipped": False,
+                    "skipped": bool(test.get("metadata", {}).get("skip", False)),
                     "hidden": False,
                     "start_time": data.get("time", 0),
                     "end_time": None,
@@ -100,7 +105,7 @@ with open(input_file, "r", encoding="utf-8", errors="ignore") as file:
 
             if test_id in tests:
                 tests[test_id]["result"] = data.get("result", "unknown")
-                tests[test_id]["skipped"] = data.get("skipped", False)
+                tests[test_id]["skipped"] = data.get("skipped", False) or tests[test_id]["skipped"]
                 tests[test_id]["hidden"] = data.get("hidden", False)
                 tests[test_id]["end_time"] = data.get("time", 0)
 
@@ -137,8 +142,10 @@ with open(input_file, "r", encoding="utf-8", errors="ignore") as file:
             test_id = data.get("testID")
             if test_id in tests:
                 tests[test_id]["logs"].append(error_text)
+                tests[test_id]["has_error"] = True
 
         elif event_type == "done":
+            run_completed = True
             final_success = data.get("success", False)
             total_time = data.get("time", 0)
 
@@ -163,8 +170,20 @@ failed_tests_list = [
 total_tests = len(visible_tests)
 passed_tests = len(passed_tests_list)
 failed_tests = len(failed_tests_list)
+skipped_tests = sum(get_display_result(test) == "SKIPPED" for test in visible_tests)
+interrupted_tests = sum(get_display_result(test) == "INTERRUPTED" for test in visible_tests)
 
-status_text = "PASSED" if final_success else "FAILED"
+final_success = final_success and not failed_tests and not interrupted_tests
+process_exit_code = os.environ.get("TEST_PROCESS_EXIT_CODE", "0")
+if process_exit_code != "0":
+    final_success = False
+status_text = "INTERRUPTED" if not run_completed else ("PASSED" if final_success else "FAILED")
+run_note = os.environ.get("TEST_RUN_NOTE", "")
+if process_exit_code != "0":
+    run_note += f" Flutter command exited with code {process_exit_code}."
+if final_success and os.environ.get("TEST_PASSED_ON_RETRY") == "true":
+    status_text = "PASSED ON RETRY"
+    run_note = "An earlier attempt failed. Inspect the per-attempt results and diagnostics."
 status_class = "passed" if final_success else "failed"
 platform_name = os.environ.get("TEST_PLATFORM", "Flutter")
 
@@ -180,10 +199,13 @@ def build_markdown_summary():
         "",
         f"### {status_icon} Overall result: {status_text}",
         "",
-        "| Total | Passed | Failed | Duration |",
-        "| ---: | ---: | ---: | ---: |",
+        run_note,
+        "",
+        "| Total | Passed | Failed | Skipped | Interrupted | Duration |",
+        "| ---: | ---: | ---: | ---: | ---: | ---: |",
         (
             f"| {total_tests} | {passed_tests} | {failed_tests} | "
+            f"{skipped_tests} | {interrupted_tests} | "
             f"{round(total_time / 1000, 2)}s |"
         ),
         "",
@@ -196,19 +218,20 @@ def build_markdown_summary():
     if visible_tests:
         for test in visible_tests:
             display_result = get_display_result(test)
-            result_icon = "✅" if display_result == "PASSED" else "❌"
+            result_icon = {"PASSED": "✅", "FAILED": "❌", "SKIPPED": "⏭", "INTERRUPTED": "⚠"}[display_result]
             duration_ms = test["duration"] if test["duration"] is not None else 0
             lines.append(
                 f"| {markdown_text(test['name'])} | "
                 f"{result_icon} {display_result} | {round(duration_ms / 1000, 2)}s |"
             )
     else:
-        lines.append("| No completed test cases were recorded. | ❌ FAILED | — |")
+        lines.append(f"| No test cases were recorded. | {status_text} | — |")
 
-    if failed_tests_list:
+    problem_tests = failed_tests_list + [test for test in visible_tests if get_display_result(test) == "INTERRUPTED"]
+    if problem_tests:
         lines.extend(["", "### Failure details", ""])
 
-        for test in failed_tests_list:
+        for test in problem_tests:
             logs = "\n".join(test.get("logs", [])).strip()
             if not logs:
                 logs = "No per-test failure output was recorded. Check the job log."
@@ -429,6 +452,10 @@ html = f"""
         .badge.failed {{
             background-color: #dc3545;
         }}
+        .badge.skipped {{ background-color: #596579; }}
+        .badge.interrupted {{ background-color: #946200; }}
+        .skipped-row {{ background-color: #eef1f5; }}
+        .interrupted-row {{ background-color: #fff4d6; }}
 
         pre {{
             background-color: #111;
@@ -487,6 +514,7 @@ html = f"""
 
         <div class="status-box">
             <h2 class="{status_class}">Overall Result: {status_text}</h2>
+            <p>{safe_text(run_note)}</p>
         </div>
 
         <div class="tabs">
@@ -513,6 +541,8 @@ html = f"""
                     <h2>{failed_tests}</h2>
                     <p>Failed</p>
                 </div>
+                <div class="card"><h2>{skipped_tests}</h2><p>Skipped</p></div>
+                <div class="card"><h2>{interrupted_tests}</h2><p>Interrupted</p></div>
 
                 <div class="card">
                     <h2>{round(total_time / 1000, 2)}s</h2>

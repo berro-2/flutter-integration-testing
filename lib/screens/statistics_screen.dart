@@ -22,7 +22,7 @@ class StatisticsScreen extends StatelessWidget {
       key: const Key('statistics_screen'),
       appBar: AppBar(title: const Text('Statistics')),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [

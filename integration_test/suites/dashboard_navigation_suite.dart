@@ -10,9 +10,9 @@ void registerDashboardNavigationSuite() {
       await driver.startApp();
 
       expect(find.text('Task Manager Dashboard'), findsOneWidget);
-      driver.expectKeyedText('dashboard_total_tasks', 'Total Tasks: 0');
-      driver.expectKeyedText('dashboard_completed_tasks', 'Completed: 0');
-      driver.expectKeyedText('dashboard_pending_tasks', 'Pending: 0');
+      driver.expectKeyedText('dashboard_total_tasks', '0');
+      driver.expectKeyedText('dashboard_completed_tasks', '0');
+      driver.expectKeyedText('dashboard_pending_tasks', '0');
       expect(find.byKey(const Key('open_task_list_button')), findsOneWidget);
       expect(find.byKey(const Key('open_add_task_button')), findsOneWidget);
       expect(find.byKey(const Key('open_statistics_button')), findsOneWidget);
