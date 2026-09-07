@@ -39,7 +39,7 @@ class TaskTestDriver {
 
     expect(condition(), isTrue, reason: failureReason);
   }
-
+ 
   Future<void> startApp() async {
     await launchApp();
     await login();
