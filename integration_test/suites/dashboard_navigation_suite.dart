@@ -5,7 +5,7 @@ import '../support/task_test_driver.dart';
 
 void registerDashboardNavigationSuite() {
   group('Dashboard and navigation', () {
-    testWidgets('shows an empty dashboard on startup', (tester) async {
+    scenarioTestWidgets('shows an empty dashboard on startup', (tester) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
 
@@ -18,7 +18,7 @@ void registerDashboardNavigationSuite() {
       expect(find.byKey(const Key('open_statistics_button')), findsOneWidget);
     });
 
-    testWidgets('opens the empty Task List', (tester) async {
+    scenarioTestWidgets('opens the empty Task List', (tester) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.openTaskList();
@@ -28,7 +28,7 @@ void registerDashboardNavigationSuite() {
       expect(find.text('No tasks available'), findsOneWidget);
     });
 
-    testWidgets('opens the Add Task screen', (tester) async {
+    scenarioTestWidgets('opens the Add Task screen', (tester) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.openAddTask();
@@ -39,7 +39,7 @@ void registerDashboardNavigationSuite() {
       expect(find.byKey(const Key('save_task_button')), findsOneWidget);
     });
 
-    testWidgets('rejects an empty task title', (tester) async {
+    scenarioTestWidgets('rejects an empty task title', (tester) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.openAddTask();

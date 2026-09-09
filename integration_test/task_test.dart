@@ -16,13 +16,13 @@ void main() {
     registerTaskCrudSuite();
     registerCompletionStatisticsSuite();
 
-    // TEMPORARY DEMO: remove this test after checking CI failure artifacts.
-    // Keep it device-only so widget checks do not stop CI before capture.
-    testWidgets('DEMO intentional failure for screenshot artifacts', (
+    // Intentional device-only failure used to verify CI screenshot artifacts.
+    scenarioTestWidgets('DEMO intentional failure for screenshot artifacts', (
       tester,
     ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
+
       driver.expectKeyedText('dashboard_total_tasks', '1');
     });
   });

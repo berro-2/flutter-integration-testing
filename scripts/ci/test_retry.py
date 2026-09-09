@@ -22,6 +22,10 @@ python3() {
     if [ "$attempt" = 1 ]; then return "$FIRST_EXIT"; fi
     return "$SECOND_EXIT"
   fi
+  if [ "$1" = scripts/ci/capture_failure_screenshots.py ]; then
+    cat
+    return 0
+  fi
   echo "report exit $TEST_PROCESS_EXIT_CODE" > "$TEST_REPORTS_DIR/report.txt"
 }
 source "$RUN_SCRIPT" simulator-fixture

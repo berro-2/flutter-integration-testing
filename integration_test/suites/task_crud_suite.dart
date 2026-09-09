@@ -5,7 +5,9 @@ import '../support/task_test_driver.dart';
 
 void registerTaskCrudSuite() {
   group('Task creation, details, and deletion', () {
-    testWidgets('adds a task and updates Dashboard counts', (tester) async {
+    scenarioTestWidgets('adds a task and updates Dashboard counts', (
+      tester,
+    ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.createTask(
@@ -18,7 +20,9 @@ void registerTaskCrudSuite() {
       driver.expectKeyedText('dashboard_pending_tasks', '1');
     });
 
-    testWidgets('uses a fallback when description is omitted', (tester) async {
+    scenarioTestWidgets('uses a fallback when description is omitted', (
+      tester,
+    ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.createTask(title: 'Task without description');
@@ -31,7 +35,9 @@ void registerTaskCrudSuite() {
       );
     });
 
-    testWidgets('opens Task Details with the saved content', (tester) async {
+    scenarioTestWidgets('opens Task Details with the saved content', (
+      tester,
+    ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.createTask(
@@ -50,7 +56,9 @@ void registerTaskCrudSuite() {
       driver.expectKeyedText('details_task_status', 'Status: Pending');
     });
 
-    testWidgets('deletes one task without removing the others', (tester) async {
+    scenarioTestWidgets('deletes one task without removing the others', (
+      tester,
+    ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.createTask(title: 'Task to delete');

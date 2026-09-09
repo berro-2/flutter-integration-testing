@@ -47,10 +47,10 @@ Both mobile jobs use Flutter `3.41.4`, Python `3.12`, and upload reports even wh
 
 | Platform | Uploaded artifacts | Screenshot behavior |
 | --- | --- | --- |
-| Android | HTML report, machine-readable results, verbose Flutter log, emulator logcat, device information, exit code, and the release app bundle after success. | Captures `android_diagnostics/failure.png` when the integration-test command exits with a failure. |
-| iOS | HTML report, results and verbose logs for each attempt, boot logs, simulator logs, exit codes, and retry evidence. | Captures `failure.png` inside every failed attempt directory. |
+| Android | HTML report, machine-readable results, verbose Flutter log, emulator logcat, device information, exit code, and the release app bundle after success. | Captures a named image under `android_diagnostics/failure-screenshots/` while each failed test is still active. It also captures `android_diagnostics/failure.png` after the command as a fallback. |
+| iOS | HTML report, results and verbose logs for each attempt, boot logs, simulator logs, exit codes, and retry evidence. | Captures a named image under each attempt's `failure-screenshots/` directory while the failed test is still active. It also captures the attempt's `failure.png` as a fallback. |
 
-Screenshots show the device state after the failed test command returns. They may not capture the exact instant an assertion failed. Failures that occur before test execution, such as missing secrets or simulator startup problems, may not produce a screenshot.
+Each integration scenario uses a shared failure wrapper. When an assertion throws, the wrapper emits a screenshot request and keeps the failed UI active for three seconds while the CI runner captures it. Crashes, process timeouts, and failures before test execution can bypass this wrapper, so the platform scripts retain an end-of-run screenshot as a fallback when the device is available.
 
 ## Common CI failure areas
 

@@ -1,7 +1,34 @@
+import 'package:flutter/foundation.dart' show debugPrintSynchronously;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_demo_app/main.dart' as app;
 import 'package:integration_demo_app/config/demo_credentials.dart';
+import 'package:integration_test/integration_test.dart';
+
+const _failureScreenshotMarker = 'CI_SCREENSHOT_REQUEST:';
+const _failureScreenshotWindow = Duration(seconds: 3);
+
+void scenarioTestWidgets(String description, WidgetTesterCallback callback) {
+  testWidgets(description, (tester) async {
+    try {
+      await callback(tester);
+    } catch (error, stackTrace) {
+      if (tester.binding is IntegrationTestWidgetsFlutterBinding) {
+        final screenshotName = description
+            .toLowerCase()
+            .replaceAll(RegExp('[^a-z0-9]+'), '-')
+            .replaceAll(RegExp(r'^-+|-+$'), '');
+
+        // The CI runner watches Flutter's machine output for this marker and
+        // captures the device while this test is still active.
+        debugPrintSynchronously('$_failureScreenshotMarker$screenshotName');
+        await Future<void>.delayed(_failureScreenshotWindow);
+      }
+
+      Error.throwWithStackTrace(error, stackTrace);
+    }
+  });
+}
 
 class TaskTestDriver {
   TaskTestDriver(this.tester);

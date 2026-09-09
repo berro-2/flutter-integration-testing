@@ -24,8 +24,11 @@ for attempt in 1 2; do
   python3 scripts/ci/run_with_timeout.py 420 \
     flutter --verbose test integration_test/task_test.dart \
     -d "$device_id" --machine --dart-define-from-file="$credentials_file" \
-    > "$attempt_dir/test_results.json" 2> "$attempt_dir/verbose.log"
-  test_exit_code=$?
+    2> >(tee "$attempt_dir/verbose.log" >&2) \
+    | tee "$attempt_dir/test_results.json" \
+    | python3 scripts/ci/capture_failure_screenshots.py \
+        ios "$device_id" "$attempt_dir/failure-screenshots"
+  test_exit_code=${PIPESTATUS[0]}
   set -e
   printf '%s\n' "$test_exit_code" > "$attempt_dir/exit-code.txt"
   cat "$attempt_dir/test_results.json"
@@ -46,6 +49,7 @@ for attempt in 1 2; do
     exit 0
   fi
 
+  # Fallback for crashes and timeouts that bypass the per-test failure wrapper.
   xcrun simctl io "$device_id" screenshot "$attempt_dir/failure.png" || true
   xcrun simctl spawn "$device_id" log show --last 5m --style compact \
     > "$attempt_dir/simulator.log" 2>&1 || true

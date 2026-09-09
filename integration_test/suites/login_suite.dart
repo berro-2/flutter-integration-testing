@@ -5,7 +5,7 @@ import '../support/task_test_driver.dart';
 
 void registerLoginSuite() {
   group('Login', () {
-    testWidgets('rejects invalid credentials', (tester) async {
+    scenarioTestWidgets('rejects invalid credentials', (tester) async {
       final driver = TaskTestDriver(tester);
       await driver.launchApp();
       await driver.login(username: 'wrong-user', password: 'wrong-password');

@@ -5,7 +5,9 @@ import '../support/task_test_driver.dart';
 
 void registerCompletionStatisticsSuite() {
   group('Task completion and statistics', () {
-    testWidgets('marks a task completed from Task List', (tester) async {
+    scenarioTestWidgets('marks a task completed from Task List', (
+      tester,
+    ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.createTask(title: 'Complete from list');
@@ -15,7 +17,9 @@ void registerCompletionStatisticsSuite() {
       driver.expectKeyedText('task_status_0', 'Completed');
     });
 
-    testWidgets('marks a task completed from Task Details', (tester) async {
+    scenarioTestWidgets('marks a task completed from Task Details', (
+      tester,
+    ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.createTask(title: 'Complete from details');
@@ -29,7 +33,9 @@ void registerCompletionStatisticsSuite() {
       driver.expectKeyedText('task_status_0', 'Completed');
     });
 
-    testWidgets('shows zero statistics when no tasks exist', (tester) async {
+    scenarioTestWidgets('shows zero statistics when no tasks exist', (
+      tester,
+    ) async {
       final driver = TaskTestDriver(tester);
       await driver.startApp();
       await driver.openStatistics();
@@ -40,7 +46,7 @@ void registerCompletionStatisticsSuite() {
       expect(find.text('0% completed'), findsOneWidget);
     });
 
-    testWidgets('shows correct statistics for mixed task states', (
+    scenarioTestWidgets('shows correct statistics for mixed task states', (
       tester,
     ) async {
       final driver = TaskTestDriver(tester);
