@@ -10,7 +10,7 @@ import 'support/task_test_driver.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Task manager integration tests', () {
+  group('Task manager integration tests ', () {
     registerLoginSuite();
     registerDashboardNavigationSuite();
     registerTaskCrudSuite();
